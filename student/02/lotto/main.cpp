@@ -37,9 +37,9 @@ int main() {
     cin >> drawn_balls;
 
     if (error_checks(total_amount, drawn_balls) == 1){
-        return 1;}
+        return 0;}
 
-    cout << "The probability of quessing all " << drawn_balls << " balls correctly is 1/" <<
+    cout << "The probability of guessing all " << drawn_balls << " balls correctly is 1/" <<
     probability(total_amount, drawn_balls) << endl;
 
 
