@@ -7,7 +7,7 @@ int error_checks(int total_amount, int drawn_balls) {
         cout << "The number of balls must be a positive number." << endl;
         return 1;
     } else if (drawn_balls > total_amount) {
-        cout << "The maximum number of drawn balls if the total amount of balls." << endl;
+        cout << "The maximum number of drawn balls is the total amount of balls." << endl;
         return 1;
     } else {
         return 0;
