@@ -2,14 +2,29 @@
 
 using namespace std;
 
-void error_checks(int total_amount, int drawn_balls) {
+int error_checks(int total_amount, int drawn_balls) {
     if (total_amount <=0 or drawn_balls <=0) {
         cout << "The number of balls must be a positive number." << endl;
-        return;
+        return 1;
     } else if (drawn_balls > total_amount) {
         cout << "The maximum number of drawn balls if the total amount of balls." << endl;
-        return;
+        return 1;
+    } else {
+        return 0;
     }}
+
+unsigned long int factorial(int number) {
+    unsigned long int fact = 1;
+    for (int x = 1; x < number +1; ++x){
+        fact *=x;
+    }return fact;
+}
+
+unsigned long int probability(int total_amount, int drawn_balls) {
+    unsigned long int calc = 0;
+    calc = factorial(total_amount) / (factorial((total_amount-drawn_balls))*factorial(drawn_balls));{
+    }return calc ;
+}
 
 int main() {
 
@@ -21,7 +36,12 @@ int main() {
     int drawn_balls = 0;
     cin >> drawn_balls;
 
-    error_checks(total_amount, drawn_balls);
+    if (error_checks(total_amount, drawn_balls) == 1){
+        return 1;}
+
+    cout << "The probability of quessing all " << drawn_balls << " balls correctly is 1/" <<
+    probability(total_amount, drawn_balls) << endl;
+
 
 
     return 0;
