@@ -28,11 +28,11 @@ unsigned long int probability(int total_amount, int drawn_balls) {
 
 int main() {
 
-    cout << "Enter the total number of lottery balls: " << endl;
+    cout << "Enter the total number of lottery balls: ";
     int total_amount = 0;
     cin >> total_amount;
 
-    cout << "Enter the number of drawn balls: " << endl;
+    cout << "Enter the number of drawn balls: ";
     int drawn_balls = 0;
     cin >> drawn_balls;
 
