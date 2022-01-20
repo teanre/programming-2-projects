@@ -11,7 +11,7 @@ const int KEY_LENGTH = 26;
 const string ERROR_LENGTH = "Error! The encryption key must contain 26 characters." ;
 const string LOWER_CASE = "Error! The encryption key must contain only lower case characters.";
 const string ERROR_ALPHABET = "Error! The encryption key must contain all alphabets a-z.";
-const string LOWER_CASE_ENCRKEY = "Error! The encryption key must contain all alphabets a-z.";
+const string LOWER_CASE_ENCRKEY = "Error! The text to be encrypted must contain all alphabets a-z.";
 
 bool check_length(string string_input) {
 
@@ -82,7 +82,6 @@ int main()
         return EXIT_FAILURE;
     }
 
-    ;
 
     cout << "Encrypted text: " << encryption(encr_key, text) << endl;
 
