@@ -49,6 +49,7 @@ bool Account::take_money(int sum)
         return true;
     }
 }
+    return true;
 }
 
 void Account::transfer_to(Account& receiving_owner, int sum)
