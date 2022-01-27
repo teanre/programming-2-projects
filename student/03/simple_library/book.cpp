@@ -31,7 +31,6 @@ void Book::print() const
         loaning_date_.print();
         cout << "- to be returned: ";
         due_date_.print();
-        cout << endl;
     }
 }
 
