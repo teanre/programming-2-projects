@@ -26,6 +26,7 @@ bool same_values(std::vector<int>& ints)
            return true;
         }
     }
+    return true;
 }
 
 bool is_ordered_non_strict_ascending(std::vector<int>& ints)
@@ -34,10 +35,9 @@ bool is_ordered_non_strict_ascending(std::vector<int>& ints)
     for (unsigned int index = 0; index < ints.size(); ++index){
         if (ints.at(index+1) >= ints.at(index)){
             return true;
-        }else{
-            return false;
         }
     }
+    return false;
 }
 
 bool is_arithmetic_series(std::vector<int>& ints)
@@ -76,7 +76,6 @@ bool is_geometric_series(std::vector<int>& ints)
         } else {
             return false;
         }
-
 }
 
 int main()
