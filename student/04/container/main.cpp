@@ -22,7 +22,7 @@ bool same_values(std::vector<int>& ints)
     for (unsigned int index = 0; index < ints.size(); ++index){
         if (ints.at(index) != ints.at(index+1)){
             return false;
-        }else{
+        } else {
            return true;
         }
     }
@@ -45,13 +45,12 @@ bool is_arithmetic_series(std::vector<int>& ints)
     std::vector<int> difference;
     //jos kahden peräkkäisen alkion erotus on aina sama
     for (unsigned int index = 0; index < ints.size()-1; ++index){
-
         difference.push_back(ints.at(index) - ints.at(index+1));
     }
 
     if (same_values(difference)){
         return true;
-    }else{
+    } else {
         return false;
     }
 }
@@ -59,7 +58,25 @@ bool is_arithmetic_series(std::vector<int>& ints)
 bool is_geometric_series(std::vector<int>& ints)
 {
     //peräkkäisten termien suhdeluku vakio
-    return true;
+
+    std::vector<int> ratios;
+
+    int ratio = 0;
+
+    for (unsigned int index = 0; index < (ints.size()-1); ++index){
+       if (ints.at(index +1) == ints.back()){
+           continue;
+       } else {
+        ratio = ints.at(index+1)/ints.at(index);
+        ratios.push_back(ratio);
+       }}
+
+   if (same_values(ratios)){
+            return true;
+        } else {
+            return false;
+        }
+
 }
 
 int main()
