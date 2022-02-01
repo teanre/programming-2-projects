@@ -19,10 +19,14 @@ bool same_values(std::vector<int>& ints)
 {
     //onko kaikki alkiot samoja
 
-    for (unsigned int index = 0; index < ints.size(); ++index){
-        if (ints.at(index) != ints.at(index+1)){
+    for (unsigned long int index = 0; index < ints.size(); ++index)
+    {
+        if (ints.at(index) != ints.at(index+1))
+        {
             return false;
-        } else {
+        }
+        else
+        {
            return true;
         }
     }
@@ -32,8 +36,14 @@ bool same_values(std::vector<int>& ints)
 bool is_ordered_non_strict_ascending(std::vector<int>& ints)
 {
    //onko seuraava alkio joko yhtä suuri tai suurempi kuin edellinen
-    for (unsigned int index = 0; index < ints.size(); ++index){
-        if (ints.at(index+1) >= ints.at(index)){
+    for (unsigned long int index = 0; index < ints.size(); ++index)
+    {
+        if (ints.at(index+1) == ints.back())
+        {
+            break;
+        }
+        else if (ints.at(index) <= ints.at(index+1))
+        {
             return true;
         }
     }
@@ -43,16 +53,24 @@ bool is_ordered_non_strict_ascending(std::vector<int>& ints)
 bool is_arithmetic_series(std::vector<int>& ints)
 {
     std::vector<int> difference;
+
     //jos kahden peräkkäisen alkion erotus on aina sama
-    for (unsigned int index = 0; index < ints.size()-1; ++index){
-        difference.push_back(ints.at(index) - ints.at(index+1));
-    }
+    for (unsigned long int index = 0; index < ints.size(); ++index)
+    {
+        if (ints.at(index+1) == ints.back())
+        {
+            break;
+        }
+        else
+        {
+            (difference.push_back(ints.at(index) - ints.at(index+1)));
+        }}
+
 
     if (same_values(difference)){
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 bool is_geometric_series(std::vector<int>& ints)
