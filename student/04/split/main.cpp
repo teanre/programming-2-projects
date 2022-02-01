@@ -1,10 +1,46 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <string>
 
 
 // TODO: Implement split function here
 // Do not change main function
+
+std::vector <std::string> split(const std::string& text,
+                                char splitting_char,
+                                bool pass_or_not = false)
+{
+    std::vector<std::string> parts;
+
+    std::string::size_type start = 0;
+    std::string::size_type end = 0;
+
+
+    while (start < text.size())
+    {
+        std::string part = "";
+
+        end = text.find(splitting_char, start);
+
+        if (end == std::string::npos)
+        {
+            end = text.size();
+        }
+
+        part = text.substr(start, (end - start));
+
+        if (part != "" || !pass_or_not)
+        {
+            parts.push_back(part);
+        }
+
+        start = end+1;
+
+    }
+    return parts;
+}
+
 
 
 int main()
