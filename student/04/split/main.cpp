@@ -7,8 +7,8 @@
 // TODO: Implement split function here
 // Do not change main function
 
-std::vector <std::string> split(const std::string& text,
-                                char splitting_char,
+std::vector <std::string> split(std::string const& text,
+                                const char splitting_char,
                                 bool pass_or_not = false)
 {
     std::vector<std::string> parts;
@@ -17,7 +17,7 @@ std::vector <std::string> split(const std::string& text,
     std::string::size_type end = 0;
 
 
-    while (start < text.size())
+    while (start <= text.size())
     {
         std::string part = "";
 
