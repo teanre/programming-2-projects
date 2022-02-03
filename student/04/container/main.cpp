@@ -12,6 +12,7 @@ void read_integers(std::vector< int >& ints, int count)
         // TODO: Implement your solution here
         ints.push_back(new_integer);
     }
+
 }
 
 // TODO: Implement your solution here
@@ -53,29 +54,36 @@ bool is_ordered_non_strict_ascending(std::vector<int>& ints)
 
 bool is_arithmetic_series(std::vector<int>& ints)
 {
+
+    if (same_values(ints))
+    {
+        return true;
+    }
+
     std::vector<int> difference;
 
     //jos kahden peräkkäisen alkion erotus on aina sama
-    for (unsigned int i = 0; i < ints.size(); ++i)
+    //tökkää tähän kun kaikki nrot samoja, tyhjä vektori???
+
+    int previous = ints.front();
+
+    for (int i : ints)
     {
-        if (ints.at(i) == ints.front())
+        if (i == ints.front())
         {
-            int diff = (ints.at(i) - ints.at(i+1));
-            difference.push_back(diff);
+            continue;
         }
 
-        if (ints.at(i) == ints.back())
-        {
-            int diff = (ints.at(i-1) - ints.at(i));
-            difference.push_back(diff);
-        }
-        else
-        {
-        difference.push_back(ints.at(i) - ints.at(i+1));
-        }
+        int diff = (i - previous);
+        std::cout << diff << std::endl;
+        difference.push_back(diff);
+        previous = i;
+
     }
 
-    if (!same_values(difference)){
+
+    if (!same_values(difference))
+    {
         return false;
     }
     return true;
@@ -85,7 +93,15 @@ bool is_geometric_series(std::vector<int>& ints)
 {
     //peräkkäisten termien suhdeluku vakio
 
-    // entäs jo kaikki luvut nolla
+    if (same_values(ints) && ints.front() == 0)
+    {
+        return false;
+    }
+    else if (same_values(ints))
+    {
+        return true;
+    }
+
 
     std::vector<int> ratios;
 
@@ -93,6 +109,7 @@ bool is_geometric_series(std::vector<int>& ints)
 
     for (unsigned int index = 0; index < ints.size(); ++index)
     {
+
        if (ints.at(index) == ints.back())
        {
            continue;
@@ -104,11 +121,15 @@ bool is_geometric_series(std::vector<int>& ints)
        }
     }
 
-    if (same_values(ratios)){
-            return true;
-        } else {
 
-         return false;
+    if (same_values(ratios))
+    {
+        return true;
+    }
+    else
+    {
+
+     return false;
 
 }}
 
