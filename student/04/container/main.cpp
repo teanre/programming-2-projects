@@ -75,7 +75,6 @@ bool is_arithmetic_series(std::vector<int>& ints)
         }
 
         int diff = (i - previous);
-        std::cout << diff << std::endl;
         difference.push_back(diff);
         previous = i;
 
