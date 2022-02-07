@@ -24,6 +24,11 @@ const unsigned int BOARD_SIDE = 5;
 const unsigned char EMPTY = ' ';
 
 
+bool didYouWin(std::vector<std::vector<int>>& gameboard);
+//bool didYouLose(std::vector<std::vector<int>>& gameboard);
+
+//bool errorChecks(string x, string y, std::vector<std::vector<int>>& gameboard);
+
 // Muuttaa annetun numeerisen merkkijonon vastaavaksi kokonaisluvuksi
 // (kutsumalla stoi-funktiota).
 // Jos annettu merkkijono ei ole numeerinen, palauttaa nollan.
@@ -136,13 +141,50 @@ std::vector<std::vector<int>> createBoard()
     return gameboard;
 }
 
+//checks if the given coordinates can be used
+bool errorChecks(string& x, string& y, std::vector<std::vector<int>>& gameboard)
+{
+    unsigned int x_as_int = stoi_with_check(x);
+    unsigned int y_as_int = stoi_with_check(y);
+
+    //tarkistetaan osuuko annetut koordinaatit koordinaatistoon
+    //mikäli käyttäjä antanut muun kun numeron, stoi with check palauttaa nollan
+    if (x_as_int < 1 || x_as_int > 5 || y_as_int < 1 || y_as_int > 5)
+    {
+        cout << "Out of board" << endl;
+        return false;
+    }
+
+    //jos koordinaatit jo arvattu, ohjelma ilmoittaa
+    else if (gameboard.at(x_as_int-1).at(y_as_int-1) == 0)
+    {
+        cout << "Already removed" << endl;
+        return false;
+    }
+    return true;
+}
+
+
+void makeAmove(string& x, string& y, std::vector<std::vector<int>>& gameboard)
+{
+    unsigned int x_as_int = stoi_with_check(x);
+    unsigned int y_as_int = stoi_with_check(y);
+
+    gameboard.at(x_as_int-1).at(y_as_int-1) = 0;
+    print(gameboard);
+    didYouWin(gameboard);
+
+}
+
+
+//asks for coordinates from user
+//if user inputs x, quit the game
 void askForCoordinates(string& x,
                        string& y,
-                       std::vector<std::vector<int>>& gameboard
-                       )
+                       std::vector<std::vector<int>>& gameboard)
 {
 
-    while (x != "q" or x != "Q")
+    while (not didYouWin(gameboard))
     {
         cout << "Enter removable element (x, y):";
 
@@ -153,36 +195,76 @@ void askForCoordinates(string& x,
         if (x == "q" or x == "Q")
         {
             cout << "Quitting" << endl;
-            break;
+            return;
         }
 
-        cin >> y;
-
-        unsigned int x_as_int = stoi_with_check(x);
-        unsigned int y_as_int = stoi_with_check(y);
-
-        // tarkistetaan, onko annetut koordinaatit numeroita
-        // yrittämällä muuntaa stoi with check funktiolla
-        if (x_as_int == 0 or y_as_int == 0)
-        {
-            cout << "out of board" << endl;
-        }
-        // jos koordinaatti on jo arvattu, eli sijainti on "nollilla"
-        // annetaan virheilmoitus
-        // huom!! koordinaatista miinustetaan yksi jotta vastaa indeksöintiä
-        else if (gameboard.at(x_as_int-1).at(y_as_int-1) == 0)
-        {
-            cout << "out of board" << endl;
-        }
-        //muussa tapauksessa siirron teko on mahdollista
         else
         {
-            gameboard.at(x_as_int-1).at(y_as_int-1) = 0;
-            print(gameboard);
+        cin >> y;
+        }
 
+        //jos errorilta tulee true, tekee muuvin
+        if (errorChecks(x, y, gameboard))
+        {
+            makeAmove(x, y, gameboard);
         }
 
     }
+
+}
+
+
+
+bool didYouWin(std::vector<std::vector<int>>& gameboard)
+{
+    //Voitto: joka rivillä ei ole samaa numeroa kuin kerran
+    //käydään jokaisen rivin alkiot läpi, mikäli kullakin rivillä
+    //1-5 vain kerran, voitat
+
+    std::vector<int> row;
+    for(int y = 0; y < 5; ++y)
+    {
+        row = gameboard.at(y);
+
+        int nr_1 = 0;
+        int nr_2 = 0;
+        int nr_3 = 0;
+        int nr_4 = 0;
+        int nr_5 = 0;
+
+        for (int nr : row)
+        {
+            if (nr == 1)
+            {
+                nr_1 +=1;
+            }
+            if (nr == 2)
+            {
+                nr_2 +=1;
+            }
+            if (nr == 3)
+            {
+                nr_3 +=1;
+            }
+            if (nr == 4)
+            {
+                nr_4 +=1;
+            }
+            if (nr == 5)
+            {
+                nr_5 +=1;
+            }
+        }
+
+        if (nr_1 > 1 || nr_2 > 1 or nr_3 > 1 || nr_4 > 1 || nr_5 > 1)
+        {
+            return false;
+        }
+
+        }
+
+
+    return true;
 
 }
 
@@ -198,14 +280,25 @@ int main()
     string y = "";
 
 
-    askForCoordinates(x, y, gameboard);
-
-
-
-    if (x == "q" || x == "Q")
+    // peli jatkuu kunnes didyouwinistä tulee true tai didyoulosesta tulee true
+    // tai x - koordinaatti on q tai Q
+    while (true)
     {
-        return EXIT_SUCCESS;
-    }
 
+        askForCoordinates(x, y, gameboard);
+
+        if (x == "q" || x == "Q")
+        {
+            break;
+        }
+
+        if (didYouWin(gameboard))
+        {
+            cout << "You won" << endl;
+            break;
+        }
+
+
+    }
     return EXIT_SUCCESS;
 }
