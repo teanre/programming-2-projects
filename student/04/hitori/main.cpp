@@ -22,10 +22,10 @@ using namespace std;
 
 const unsigned int BOARD_SIDE = 5;
 const unsigned char EMPTY = ' ';
-
+const unsigned int EMPTY_SPACE = 0;
 
 bool didYouWin(std::vector<std::vector<int>>& gameboard);
-//bool didYouLose(std::vector<std::vector<int>>& gameboard);
+bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard);
 
 //bool errorChecks(string x, string y, std::vector<std::vector<int>>& gameboard);
 
@@ -172,19 +172,21 @@ void makeAmove(string& x, string& y, std::vector<std::vector<int>>& gameboard)
 
     gameboard.at(x_as_int-1).at(y_as_int-1) = 0;
     print(gameboard);
-    didYouWin(gameboard);
 
+    didYouLose(x, y, gameboard);
+    didYouWin(gameboard);
 }
 
 
 //asks for coordinates from user
+
 //if user inputs x, quit the game
 void askForCoordinates(string& x,
                        string& y,
                        std::vector<std::vector<int>>& gameboard)
 {
-
-    while (not didYouWin(gameboard))
+    //not didYouWin(gameboard) ||
+    while (true)
     {
         cout << "Enter removable element (x, y):";
 
@@ -209,10 +211,51 @@ void askForCoordinates(string& x,
             makeAmove(x, y, gameboard);
         }
 
+        if (didYouLose(x, y, gameboard) || didYouWin(gameboard))
+        {
+            break;
+        }
+
     }
 
 }
 
+bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard)
+{
+
+    unsigned int x_as_int = stoi_with_check(x);
+    unsigned int y_as_int = stoi_with_check(y);
+
+    //jos y_as_int on 1 - sijaitsee indeksissä nolla, ei voida tarkastaa edellistä (eli -2)tsekataan vaan seuraava
+    //jos y_as_int on 5 - sijaitsee indeksissä 4, ei voida tarkastaa seuraavaa
+
+    if (y_as_int == 1)
+    {
+        if(gameboard.at(x_as_int-1).at(y_as_int) == EMPTY_SPACE)
+        {
+            return true;
+        }
+
+    }
+
+    //tsekataan vaan edellinen
+    else if (y_as_int == 5)
+    {
+        if(gameboard.at(x_as_int-1).at(y_as_int-2) == EMPTY_SPACE)
+        {
+            return true;
+        }
+    }
+    //jos poistat ruudun vierekkäisen joka tyhjä on niin häviö sinut vie ohoi
+
+    else if ( gameboard.at(x_as_int-1).at(y_as_int) == EMPTY_SPACE
+             || gameboard.at(x_as_int-1).at(y_as_int-2) == EMPTY_SPACE)
+         {
+                return true;
+         }
+
+    return false;
+}
 
 
 bool didYouWin(std::vector<std::vector<int>>& gameboard)
@@ -256,7 +299,7 @@ bool didYouWin(std::vector<std::vector<int>>& gameboard)
             }
         }
 
-        if (nr_1 > 1 || nr_2 > 1 or nr_3 > 1 || nr_4 > 1 || nr_5 > 1)
+        if (nr_1 > 1 || nr_2 > 1 || nr_3 > 1 || nr_4 > 1 || nr_5 > 1)
         {
             return false;
         }
@@ -284,7 +327,6 @@ int main()
     // tai x - koordinaatti on q tai Q
     while (true)
     {
-
         askForCoordinates(x, y, gameboard);
 
         if (x == "q" || x == "Q")
@@ -298,6 +340,11 @@ int main()
             break;
         }
 
+        if (didYouLose(x, y, gameboard))
+        {
+            cout << "You lost" << endl;
+            break;
+        }
 
     }
     return EXIT_SUCCESS;
