@@ -156,7 +156,7 @@ bool errorChecks(string& x, string& y, std::vector<std::vector<int>>& gameboard)
     }
 
     //jos koordinaatit jo arvattu, ohjelma ilmoittaa
-    else if (gameboard.at(x_as_int-1).at(y_as_int-1) == 0)
+    else if (gameboard.at(x_as_int-1).at(y_as_int-1) == EMPTY_SPACE)
     {
         cout << "Already removed" << endl;
         return false;
@@ -178,9 +178,7 @@ void makeAmove(string& x, string& y, std::vector<std::vector<int>>& gameboard)
 }
 
 
-//asks for coordinates from user
-
-//if user inputs x, quit the game
+//kysyy käyttäjältä koordinaatit ja tekee siirron mikäli mahdollista
 void askForCoordinates(string& x,
                        string& y,
                        std::vector<std::vector<int>>& gameboard)
@@ -211,6 +209,7 @@ void askForCoordinates(string& x,
             makeAmove(x, y, gameboard);
         }
 
+        //jos tekee voitto- tai häviömuuvin, koordinaattien kysely lopetetaan toki
         if (didYouLose(x, y, gameboard) || didYouWin(gameboard))
         {
             break;
@@ -226,8 +225,39 @@ bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard)
     unsigned int x_as_int = stoi_with_check(x);
     unsigned int y_as_int = stoi_with_check(y);
 
+    //jos x on 1, yläpuolella ei oo mitään, tarkistetaan vaan vieri ja alta
+    //tää tarkistaa alta
+    if (x_as_int == 1)
+    {
+        if (gameboard.at(x_as_int).at(y_as_int-1) == EMPTY_SPACE)
+        {
+            return true;
+        }
+    }
+
+    //jos x on 5, alapuolella ei mitään, tää tarkistaa onko yläpuolella oleva tyhjä
+    if (x_as_int == 5)
+    {
+        if (gameboard.at(x_as_int-2).at(y_as_int-1) == EMPTY_SPACE)
+        {
+            return true;
+        }
+    }
+
+    //ylä- JA alapuoli keskellä lautaa
+    if (x_as_int > 1 && x_as_int < 5)
+    {
+        if (gameboard.at(x_as_int).at(y_as_int-1) == EMPTY_SPACE ||
+                gameboard.at(x_as_int-2).at(y_as_int-1) == EMPTY_SPACE)
+        {
+            return true;
+        }
+    }
+
     //jos y_as_int on 1 - sijaitsee indeksissä nolla, ei voida tarkastaa edellistä (eli -2)tsekataan vaan seuraava
     //jos y_as_int on 5 - sijaitsee indeksissä 4, ei voida tarkastaa seuraavaa
+
+
 
     if (y_as_int == 1)
     {
