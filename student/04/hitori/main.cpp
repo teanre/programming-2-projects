@@ -91,7 +91,7 @@ std::vector<std::vector<int>> createBoard()
     while (input != "r" || input != "R" || input != "i" || input != "I")
     {
         string input = "";
-        cout << "Select start (R for random, I for input) :" << endl;
+        cout << "Select start (R for random, I for input): ";
         cin >> input;
 
         if (input == "r" || input == "R")
@@ -119,17 +119,17 @@ std::vector<std::vector<int>> createBoard()
 
         if (input == "i" or input == "I")
         {
-            cout << "Input: " << endl;
+            cout << "Input: ";
 
-            int numbers_from_user = 0;
+            int number_from_user = 0;
 
             for (int x = 0; x <5; ++x)
             {
                 std::vector<int> row;
                 for (int y = 0; y < 5; ++y)
                 {
-                    cin >> numbers_from_user;
-                    row.push_back(numbers_from_user);
+                    cin >> number_from_user;
+                    row.push_back(number_from_user);
                 }
 
                 gameboard.push_back(row);
@@ -137,12 +137,11 @@ std::vector<std::vector<int>> createBoard()
 
             break;
         }
-
     }
     return gameboard;
 }
 
-//checks if the given coordinates can be used
+// Tarkistaa käyttäjän antamien koordinaattien käyttökelpoisuuden
 bool errorChecks(string& x, string& y, std::vector<std::vector<int>>& gameboard)
 {
     unsigned int x_as_int = stoi_with_check(x);
@@ -156,22 +155,25 @@ bool errorChecks(string& x, string& y, std::vector<std::vector<int>>& gameboard)
         return false;
     }
 
-    //jos koordinaatit jo arvattu, ohjelma ilmoittaa
-    else if (gameboard.at(x_as_int-1).at(y_as_int-1) == EMPTY_SPACE)
+    //jos koordinaatit jo arvattu, ohjelma ilmoittaa tästä
+    else if (gameboard.at(y_as_int-1).at(x_as_int-1) == EMPTY_SPACE)
     {
         cout << "Already removed" << endl;
         return false;
     }
+
     return true;
 }
 
+
+// tekee siirron ja tarkistaa tuleeko häviö- tai voittotilanne
 
 void makeAmove(string& x, string& y, std::vector<std::vector<int>>& gameboard)
 {
     unsigned int x_as_int = stoi_with_check(x);
     unsigned int y_as_int = stoi_with_check(y);
 
-    gameboard.at(x_as_int-1).at(y_as_int-1) = EMPTY_SPACE;
+    gameboard.at(y_as_int-1).at(x_as_int-1) = EMPTY_SPACE;
     print(gameboard);
 
     didYouLose(x, y, gameboard);
@@ -187,13 +189,13 @@ void askForCoordinates(string& x,
 {
     while (true)
     {
-        cout << "Enter removable element (x, y):";
+        cout << "Enter removable element (x, y): ";
 
         cin >> x;
 
         //jos käyttäjä haluaa lopettaa pelin, x-koordinaatti on q
-        //eikä y-koordinaattia kysytä
-        if (x == "q" or x == "Q")
+        //eikä y-koordinaattia kysytä/tarvita
+        if (x == "q" || x == "Q")
         {
             cout << "Quitting" << endl;
             return;
@@ -208,82 +210,101 @@ void askForCoordinates(string& x,
         if (errorChecks(x, y, gameboard))
         {
             makeAmove(x, y, gameboard);
-        }
-
-        //jos tekee voitto- tai häviömuuvin, koordinaattien kysely lopetetaan
-        if (didYouLose(x, y, gameboard) ||
-                didYouWin(gameboard) ||
-                didYouLoseLonelySpace(gameboard))
-        {
-            break;
+            //jos tekee voitto- tai häviömuuvin, koordinaattien kysely lopetetaan
+            if (didYouLose(x, y, gameboard) ||
+                    didYouWin(gameboard) ||
+                    didYouLoseLonelySpace(gameboard))
+            {
+                break;
+            }
         }
 
     }
 
 }
 
+// tarkistaa, poistiko pelaaja sellaisen ruudun, joka oli jo tyhjennetyn
+// ruudun vieressä, yläpuolella tai alapuolella
 bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard)
 {
 
     unsigned int x_as_int = stoi_with_check(x);
     unsigned int y_as_int = stoi_with_check(y);
 
-    //jos x on 1, yläpuolella ei oo mitään, tarkistetaan vaan vieri ja alta
-    //tää tarkistaa alta
-    if (x_as_int == 1)
+   /* unsigned int left_side = 0;
+    unsigned int right_side = 0;
+    unsigned int below_space = 0;
+    unsigned int above_space = 0;
+
+   // left_side = gameboard.at(y_as_int-1).at(x_as_int-2);
+    //right_side = gameboard.at(y_as_int-1).at(x_as_int);
+    below_space = gameboard.at(y_as_int).at(x_as_int-1);
+    above_space = gameboard.at(y_as_int-2).at(x_as_int-1);*/
+
+    //erikoistilanteet: jos y on 1, yläpuolella ei oo mitään, tarkistetaan vaan
+    //vierestä ja alta
+    if (y_as_int == 1 && x_as_int > 1 && x_as_int < 5)
     {
-        if (gameboard.at(x_as_int).at(y_as_int-1) == EMPTY_SPACE)
+        if (gameboard.at(y_as_int-1).at(x_as_int-2) == EMPTY_SPACE ||
+            gameboard.at(y_as_int-1).at(x_as_int) == EMPTY_SPACE ||
+            gameboard.at(y_as_int).at(x_as_int-1) == EMPTY_SPACE)
         {
             return true;
         }
     }
 
-    //jos x on 5, alapuolella ei mitään, tää tarkistaa onko yläpuolella oleva tyhjä
-    if (x_as_int == 5)
+    //jos y on 5, tarkistetaan vaan yltä ja vierestä
+    else if (y_as_int == 5 && x_as_int > 1 && x_as_int < 5)
     {
-        if (gameboard.at(x_as_int-2).at(y_as_int-1) == EMPTY_SPACE)
+        if ( gameboard.at(y_as_int-1).at(x_as_int-2) == EMPTY_SPACE ||
+            gameboard.at(y_as_int-1).at(x_as_int) == EMPTY_SPACE ||
+            gameboard.at(y_as_int-2).at(x_as_int-1) == EMPTY_SPACE)
         {
             return true;
         }
     }
 
-    //ylä- JA alapuoli keskellä lautaa
-    if (x_as_int > 1 && x_as_int < 5)
+    //jos sijainti kulmassa, ylävasen
+    else if (x_as_int == 1 && y_as_int == 1)
     {
-        if (gameboard.at(x_as_int).at(y_as_int-1) == EMPTY_SPACE ||
-                gameboard.at(x_as_int-2).at(y_as_int-1) == EMPTY_SPACE)
-        {
-            return true;
-        }
-    }
-
-    //jos y_as_int on 1 - sijaitsee indeksissä nolla, ei voida tarkastaa edellistä (eli -2)tsekataan vaan seuraava
-    //jos y_as_int on 5 - sijaitsee indeksissä 4, ei voida tarkastaa seuraavaa
-    if (y_as_int == 1)
-    {
-        if(gameboard.at(x_as_int-1).at(y_as_int) == EMPTY_SPACE)
+        if(gameboard.at(y_as_int-1).at(x_as_int) == EMPTY_SPACE ||
+            gameboard.at(y_as_int).at(x_as_int-1) == EMPTY_SPACE)
         {
             return true;
         }
 
     }
 
-    //tsekataan vaan edellinen
-    else if (y_as_int == 5)
+    //sijainti kulmassa, yläoikea
+    else if (x_as_int == 5 && y_as_int == 1)
     {
-        if(gameboard.at(x_as_int-1).at(y_as_int-2) == EMPTY_SPACE)
+        if( gameboard.at(y_as_int-1).at(x_as_int-2) == EMPTY_SPACE ||
+            gameboard.at(y_as_int).at(x_as_int-1) == EMPTY_SPACE)
         {
             return true;
         }
     }
-    //jos poistat ruudun vierekkäisen joka tyhjä on niin häviö sinut vie ohoi
 
-    else if ( gameboard.at(x_as_int-1).at(y_as_int) == EMPTY_SPACE
-             || gameboard.at(x_as_int-1).at(y_as_int-2) == EMPTY_SPACE)
-         {
-                return true;
-         }
+    else if (x_as_int == 1 && y_as_int == 5)
+    {
+        if ( gameboard.at(y_as_int-1).at(x_as_int) == EMPTY_SPACE ||
+            gameboard.at(y_as_int-2).at(x_as_int-1) == EMPTY_SPACE)
+        {
+            return true;
+        }
+    }
 
+    //sijainti keskellä lautaa, tarkistaa sivut, yltä ja alta
+    else if (y_as_int > 1 && y_as_int < 5 && x_as_int > 1 && x_as_int < 5)
+    {
+        if (gameboard.at(y_as_int-1).at(x_as_int-2) == EMPTY_SPACE ||
+             gameboard.at(y_as_int-1).at(x_as_int)    == EMPTY_SPACE ||
+              gameboard.at(y_as_int-2).at(x_as_int-1)   == EMPTY_SPACE ||
+              gameboard.at(y_as_int).at(x_as_int-1)  == EMPTY_SPACE)
+        {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -327,6 +348,7 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
                         gameboard.at(x-1).at(y) == EMPTY_SPACE &&
                         gameboard.at(x+1).at(y) == EMPTY_SPACE)
                 {
+                    cout << "h i tori" << endl;
                     return true;
                 }
             }
@@ -432,12 +454,8 @@ bool didYouWin(std::vector<std::vector<int>>& gameboard)
         {
             return false;
         }
-
         }
-
-
     return true;
-
 }
 
 
