@@ -92,7 +92,7 @@ std::vector<std::vector<int>> createBoard()
     {
         string input = "";
         cout << "Select start (R for random, I for input): ";
-        cin >> input;
+        getline(cin, input);
 
         if (input == "r" || input == "R")
         {
@@ -231,10 +231,7 @@ bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard)
     unsigned int x_as_int = stoi_with_check(x);
     unsigned int y_as_int = stoi_with_check(y);
 
-   /* unsigned int left_side = 0;
-    unsigned int right_side = 0;
-    unsigned int below_space = 0;
-    unsigned int above_space = 0;
+   /*
 
    // left_side = gameboard.at(y_as_int-1).at(x_as_int-2);
     //right_side = gameboard.at(y_as_int-1).at(x_as_int);
@@ -348,7 +345,6 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
                         gameboard.at(x-1).at(y) == EMPTY_SPACE &&
                         gameboard.at(x+1).at(y) == EMPTY_SPACE)
                 {
-                    cout << "h i tori" << endl;
                     return true;
                 }
             }
