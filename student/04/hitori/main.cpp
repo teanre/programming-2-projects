@@ -26,6 +26,7 @@ const unsigned int EMPTY_SPACE = 0;
 
 bool didYouWin(std::vector<std::vector<int>>& gameboard);
 bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard);
+bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard);
 
 //bool errorChecks(string x, string y, std::vector<std::vector<int>>& gameboard);
 
@@ -170,20 +171,20 @@ void makeAmove(string& x, string& y, std::vector<std::vector<int>>& gameboard)
     unsigned int x_as_int = stoi_with_check(x);
     unsigned int y_as_int = stoi_with_check(y);
 
-    gameboard.at(x_as_int-1).at(y_as_int-1) = 0;
+    gameboard.at(x_as_int-1).at(y_as_int-1) = EMPTY_SPACE;
     print(gameboard);
 
     didYouLose(x, y, gameboard);
+    didYouLoseLonelySpace(gameboard);
     didYouWin(gameboard);
 }
 
 
-//kysyy käyttäjältä koordinaatit ja tekee siirron mikäli mahdollista
+//kysyy käyttäjältä koordinaatit ja tekee siirrot niin kauan kuin mahdollista
 void askForCoordinates(string& x,
                        string& y,
                        std::vector<std::vector<int>>& gameboard)
 {
-    //not didYouWin(gameboard) ||
     while (true)
     {
         cout << "Enter removable element (x, y):";
@@ -209,8 +210,10 @@ void askForCoordinates(string& x,
             makeAmove(x, y, gameboard);
         }
 
-        //jos tekee voitto- tai häviömuuvin, koordinaattien kysely lopetetaan toki
-        if (didYouLose(x, y, gameboard) || didYouWin(gameboard))
+        //jos tekee voitto- tai häviömuuvin, koordinaattien kysely lopetetaan
+        if (didYouLose(x, y, gameboard) ||
+                didYouWin(gameboard) ||
+                didYouLoseLonelySpace(gameboard))
         {
             break;
         }
@@ -256,9 +259,6 @@ bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard)
 
     //jos y_as_int on 1 - sijaitsee indeksissä nolla, ei voida tarkastaa edellistä (eli -2)tsekataan vaan seuraava
     //jos y_as_int on 5 - sijaitsee indeksissä 4, ei voida tarkastaa seuraavaa
-
-
-
     if (y_as_int == 1)
     {
         if(gameboard.at(x_as_int-1).at(y_as_int) == EMPTY_SPACE)
@@ -283,6 +283,105 @@ bool didYouLose(string& x, string& y, std::vector<std::vector<int>>& gameboard)
          {
                 return true;
          }
+
+    return false;
+}
+
+bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
+{
+    //kulmatilanteet, jää yksin jos vierestä ja alta on tyhjää (yläkulmat)
+    if (gameboard.at(0).at(1) == EMPTY_SPACE &&
+            gameboard.at(1).at(0) == EMPTY_SPACE)
+    {
+        return true;
+    }
+    else if (gameboard.at(0).at(3) == EMPTY_SPACE &&
+            gameboard.at(1).at(4) == EMPTY_SPACE)
+    {
+        return true;
+    }
+
+    //jos vierestä ja yltä on tyhjää (alakulmat)
+    else if (gameboard.at(3).at(0) == EMPTY_SPACE &&
+             gameboard.at(4).at(1) == EMPTY_SPACE)
+    {
+        return true;
+    }
+
+    else if (gameboard.at(3).at(4) == EMPTY_SPACE &&
+             gameboard.at(4).at(3) == EMPTY_SPACE)
+    {
+        return true;
+    }
+
+    //keskellä, käydään lauta luupissa läpi ja tsekataan virheet??
+
+    for (int x = 0; x < 5; ++x)
+    {
+        for (int y = 0; y < 5; ++ y)
+        {
+            if (x > 0 && x < 4 && y > 0 && y < 4)
+            {
+                if (gameboard.at(x).at(y-1) == EMPTY_SPACE &&
+                        gameboard.at(x).at(y+1) == EMPTY_SPACE &&
+                        gameboard.at(x-1).at(y) == EMPTY_SPACE &&
+                        gameboard.at(x+1).at(y) == EMPTY_SPACE)
+                {
+                    return true;
+                }
+            }
+        }
+
+    }
+
+    // reunassa, ei kulmassa
+    for (int x = 0; x < 5; ++x)
+    {
+        for (int y = 0; y < 5; ++ y)
+        {
+            //ylin rivi
+            if (x == 0 && y > 0 && y < 4)
+            {
+                //jos viereiset ja allaoleva on tyhjiä, hitori ja häviö
+                if (gameboard.at(x).at(y-1) == EMPTY_SPACE &&
+                        gameboard.at(x).at(y+1) == EMPTY_SPACE &&
+                        gameboard.at(x+1).at(y) == EMPTY_SPACE)
+                {
+                    return true;
+                }
+            }
+            //alin rivi
+            else if (x == 4 && y>0 && y<4)
+            {
+                if (gameboard.at(x).at(y-1) == EMPTY_SPACE &&
+                        gameboard.at(x).at(y+1) == EMPTY_SPACE &&
+                        gameboard.at(x-1).at(y) == EMPTY_SPACE)
+                {
+                    return true;
+                }
+            }
+            //vasen laita
+            else if (x > 0 && x < 4 && y == 0)
+            {
+                if (gameboard.at(x-1).at(y) == EMPTY_SPACE &&
+                    gameboard.at(x+1).at(y) == EMPTY_SPACE &&
+                    gameboard.at(x).at(y+1) == EMPTY_SPACE)
+                {
+                    return true;
+                }
+            }
+            else if (x > 0 && x < 4 && y == 4)
+            {
+                if (gameboard.at(x-1).at(y) == EMPTY_SPACE &&
+                    gameboard.at(x+1).at(y) == EMPTY_SPACE &&
+                    gameboard.at(x).at(y-1) == EMPTY_SPACE)
+                {
+                    return true;
+                }
+            }
+        }
+
+    }
 
     return false;
 }
@@ -370,11 +469,12 @@ int main()
             break;
         }
 
-        if (didYouLose(x, y, gameboard))
+        if (didYouLose(x, y, gameboard) || didYouLoseLonelySpace(gameboard))
         {
             cout << "You lost" << endl;
             break;
         }
+
 
     }
     return EXIT_SUCCESS;
