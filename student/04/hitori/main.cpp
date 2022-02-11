@@ -5,9 +5,9 @@
  * 5 x 5. Kukin ruutu sisältää jonkin numeroista 1-5. Vaaka- ja
  * pystyriveillä voi aluksi olla useita samoja numeroita, mutta
  * tarkoituksena on poistaa numeroita niin, että kullakin vaaka- ja
- * pystyrivillä on kutakin numeroa vain yksi tai ei yhtään. Kuitenkaan
- * vierekkäisten ruutujen numeroita ei saa poistaa, eikä mikään jäljelle
- * jäävä numero (ruutu) saa jäädä irralleen muista, eli sen ympäriltä
+ * pystyrivillä on kutakin numeroa maksimissaan yksi kappale. Vierekkäisten
+ * ruutujen numeroita ei saa poistaa, eikä mikään jäljelle
+ * jäävä numero saa jäädä irralleen muista, eli sen ympäriltä
  * (yläpuolelta, alapuolelta, vasemmalta, oikealta) ei saa poistaa
  * kaikkia numeroita.
  *   Aluksi käyttäjältä kysytään, täytetäänkö peliruudukko satunnaisesti
@@ -46,12 +46,20 @@ const unsigned int BOARD_SIDE = 5;
 const unsigned char EMPTY = ' ';
 const unsigned int EMPTY_SPACE = 0;
 
-//bool errorChecks(string x, string y, std::vector<std::vector<int>>& gameboard);
-bool didYouWin(std::vector<std::vector<int>>& gameboard);
-bool didYouLose(std::vector<std::vector<int>>& gameboard);
-bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard);
-bool didYouWinRows(std::vector<std::vector<int>>& gameboard);
-bool didYouWinColumns(std::vector<std::vector<int>>& gameboard);
+using Gameboard = std::vector<std::vector<int>>;
+
+unsigned int stoi_with_check(const string& str);
+void print(const Gameboard& gameboard);
+Gameboard createBoard();
+void askForCoordinates(string& x, string& y, Gameboard& gameboard);
+bool areCoordinatesValid(string& x, string& y, Gameboard& gameboard);
+void makeAmove(string& x, string& y, Gameboard& gameboard);
+bool didYouLose(Gameboard& gameboard);
+bool didYouLoseEmpty(Gameboard& gameboard);
+bool didYouLoseLonelySpace(Gameboard& gameboard);
+bool didYouWin(Gameboard& gameboard);
+bool didYouWinRows(Gameboard& gameboard);
+bool didYouWinColumns(Gameboard& gameboard);
 
 // Muuttaa annetun numeerisen merkkijonon vastaavaksi kokonaisluvuksi
 // (kutsumalla stoi-funktiota).
@@ -78,7 +86,7 @@ unsigned int stoi_with_check(const string& str)
 }
 
 // Tulostaa pelilaudan rivi- ja sarakenumeroineen.
-void print(const std::vector<std::vector<int>>& gameboard)
+void print(const Gameboard& gameboard)
 {
     cout << "=================" << endl;
     cout << "|   | 1 2 3 4 5 |" << endl;
@@ -102,10 +110,9 @@ void print(const std::vector<std::vector<int>>& gameboard)
     cout << "=================" << endl;
 }
 
-// Luo pelilaudan käyttäjän valinnan mukaan joko satunnaisluvuilla tai
-// käyttäjän syöttämillä luvuilla. Luvut tallennetaan riveittäin
-// sisäkkäisiin vektoreihin.
-std::vector<std::vector<int>> createBoard()
+// Luo pelilaudan käyttäjän valinnan mukaan joko satunnaisluvuilla
+// tai käyttäjän syöttämillä luvuilla.
+Gameboard createBoard()
 {
     string input = "";
     std::vector<std::vector<int>> gameboard;
@@ -129,6 +136,8 @@ std::vector<std::vector<int>> createBoard()
 
                 int_seed = stoi_with_check(seed);
 
+                // seed tulee olla positiivinen kokonaisluku,
+                // kyselyä jatketaan kunnes oikea syöte käyttäjältä
                 if (int_seed > 0)
                 {
                     default_random_engine gen(int_seed);
@@ -139,12 +148,12 @@ std::vector<std::vector<int>> createBoard()
                         std::vector<int> row;
                         for( int x = 0; x < 5; ++x )
                         {
-                        row.push_back(distr(gen) );
+                            row.push_back(distr(gen) );
                         }
-
                         gameboard.push_back( row );
+                    }
                 }
-            }}
+            }
             break;
         }
 
@@ -163,21 +172,55 @@ std::vector<std::vector<int>> createBoard()
                     cin >> number_from_user;
                     row.push_back(number_from_user);
                 }
-
                 gameboard.push_back(row);
             }
             break;
         }
     }
-
     return gameboard;
+}
+
+// Kysyy käyttäjältä koordinaatit ja tekee siirrot niin kauan kuin mahdollista.
+void askForCoordinates(string& x,
+                       string& y,
+                       Gameboard& gameboard)
+{
+    while (true)
+    {
+        cout << "Enter removable element (x, y): ";
+
+        cin >> x;
+
+        // jos käyttäjä haluaa lopettaa pelin
+        if (x == "q" || x == "Q")
+        {
+            cout << "Quitting" << endl;
+            return;
+        }
+
+        cin >> y;
+
+        // tarkistetaan koordinaatit, tehdään siirto jos ovat ok
+        if (areCoordinatesValid(x, y, gameboard))
+        {
+            makeAmove(x, y, gameboard);
+
+            // Tarkistetaan tuliko häviö tai voitto.
+            // Muussa tapauksessa siirtoja jatketaan.
+            if (didYouLose(gameboard) ||
+                didYouWin(gameboard))
+            {
+                break;
+            }
+        }
+    }
 }
 
 // Tarkistaa käyttäjän antamien koordinaattien käyttökelpoisuuden,
 // paluuarvona true mikäli koordinaatit ok ja siirto voidaan tehdä.
 bool areCoordinatesValid( string& x,
                           string& y,
-                          std::vector<std::vector<int>>& gameboard)
+                          Gameboard& gameboard)
 {
     // Muunnetaan koordinaatit numeerisiksi arvoiksi (mikäli
     // käyttäjä antanut muun kun numeron, stoi with check palauttaa nollan)
@@ -205,7 +248,7 @@ bool areCoordinatesValid( string& x,
 // Tekee siirron, tulostaa pelilaudan siirron jälkeen.
 void makeAmove(string& x,
                string& y,
-               std::vector<std::vector<int>>& gameboard)
+               Gameboard& gameboard)
 {
     unsigned int x_as_int = stoi_with_check(x);
     unsigned int y_as_int = stoi_with_check(y);
@@ -215,53 +258,25 @@ void makeAmove(string& x,
 }
 
 
-// Kysyy käyttäjältä koordinaatit ja tekee siirrot niin kauan kuin mahdollista
-void askForCoordinates(string& x,
-                       string& y,
-                       std::vector<std::vector<int>>& gameboard)
+// Tarkistaa alifunktioiden avulla häviötilanteet.
+bool didYouLose(Gameboard& gameboard)
 {
-    while (true)
+    if (didYouLoseEmpty(gameboard) || didYouLoseLonelySpace(gameboard))
     {
-        cout << "Enter removable element (x, y): ";
-
-        cin >> x;
-
-        //jos käyttäjä haluaa lopettaa pelin, x-koordinaatti on q
-        //eikä y-koordinaattia kysytä/tarvita
-        if (x == "q" || x == "Q")
-        {
-            cout << "Quitting" << endl;
-            return;
-        }
-
-        cin >> y;
-
-        //tarkistetaan koordinaatit, tehdään siirto jos ovat ok
-        if (areCoordinatesValid(x, y, gameboard))
-        {
-            makeAmove(x, y, gameboard);
-
-            // Tarkistetaan tuliko häviö tai voitto.
-            // Muussa tapauksessa siirtoja jatketaan
-            if (didYouLose(gameboard) ||
-                    didYouWin(gameboard) ||
-                    didYouLoseLonelySpace(gameboard))
-            {
-                break;
-            }
-        }
+        return true;
     }
+    return false;
 }
 
-// Tarkistaa, onko vierekkäisiä tai alekkaisia ruutuja tyhjänä
-bool didYouLose(std::vector<std::vector<int>>& gameboard)
+// Tarkistaa, onko vierekkäisiä tai alekkaisia ruutuja tyhjänä.
+bool didYouLoseEmpty(Gameboard& gameboard)
 {
     // tarkistetaan vaakariveittäin onko vierekkäiset tyhjiä
     for (int i = 0; i < 5; ++i)
     {
         for (int j = 0; j < 5; ++j)
         {
-            //paitsi rivin viimeisen ruudun kohdalla ei tarvitse enää tarkistaa
+            // paitsi rivin viimeisen ruudun kohdalla ei tarvitse enää tarkistaa
             if (j == 4 )
             {
                 continue;
@@ -274,7 +289,7 @@ bool didYouLose(std::vector<std::vector<int>>& gameboard)
         }
     }
 
-    // katsotaan pystyriveittäin, onko allaoleva ruutu tyhjä
+    // katsotaan sarakkeittain, onko allaoleva ruutu tyhjä
     for (int i = 0; i < 5; ++i)
     {
         for (int j = 0; j < 5; ++j)
@@ -295,10 +310,10 @@ bool didYouLose(std::vector<std::vector<int>>& gameboard)
 }
 
 
-// tarkistetaan jääkö jokin ruutu irralleen muista luoden häviötilanteen
-bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
+// Tarkistetaan jääkö jokin ruutu irralleen muista luoden häviötilanteen.
+bool didYouLoseLonelySpace(Gameboard& gameboard)
 {
-    //kulmatilanteet, jää yksin jos vierestä ja alta on tyhjää (yläkulmat)
+    //kulmatilanteet, ovatko lähimmät ruudut ryhjä
     if (gameboard.at(0).at(1) == EMPTY_SPACE &&
             gameboard.at(1).at(0) == EMPTY_SPACE)
     {
@@ -309,14 +324,11 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
     {
         return true;
     }
-
-    //jos vierestä ja yltä on tyhjää (alakulmat)
     else if (gameboard.at(3).at(0) == EMPTY_SPACE &&
              gameboard.at(4).at(1) == EMPTY_SPACE)
     {
         return true;
     }
-
     else if (gameboard.at(3).at(4) == EMPTY_SPACE &&
              gameboard.at(4).at(3) == EMPTY_SPACE)
     {
@@ -327,7 +339,7 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
     for (int i = 0; i < 5; ++i)
     {
         for (int j = 0; j < 5; ++ j)
-        {   //keskellä
+        {   // keskellä
             if (i > 0 && i < 4 && j > 0 && j < 4)
             {
                 if (gameboard.at(i).at(j-1) == EMPTY_SPACE &&
@@ -338,10 +350,9 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
                     return true;
                 }
             }
-            //ylin rivi
+            // ylin rivi
             else if (i == 0 && j > 0 && j < 4)
             {
-                //jos viereiset ja allaoleva on tyhjiä, hitori ja häviö
                 if (gameboard.at(i).at(j-1) == EMPTY_SPACE &&
                         gameboard.at(i).at(j+1) == EMPTY_SPACE &&
                         gameboard.at(i+1).at(j) == EMPTY_SPACE)
@@ -349,7 +360,7 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
                     return true;
                 }
             }
-            //alin rivi
+            // alin rivi
             else if (i == 4 && j > 0 && j < 4)
             {
                 if (gameboard.at(i).at(j-1) == EMPTY_SPACE &&
@@ -359,7 +370,7 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
                     return true;
                 }
             }
-            //vasen laita
+            // vasen reuna
             else if (i > 0 && i < 4 && j == 0)
             {
                 if (gameboard.at(i-1).at(j) == EMPTY_SPACE &&
@@ -369,6 +380,7 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
                     return true;
                 }
             }
+            // oikea reuna
             else if (i > 0 && i < 4 && j == 4)
             {
                 if (gameboard.at(i-1).at(j) == EMPTY_SPACE &&
@@ -383,7 +395,9 @@ bool didYouLoseLonelySpace(std::vector<std::vector<int>>& gameboard)
     return false;
 }
 
-bool didYouWin(std::vector<std::vector<int>>& gameboard)
+// Tarkistaa voittotilanteen alifunktioiden avulla. Mikäli vaaka-
+// ja pystyriveissä lukuja 1-5 vain kerran, paluuarvona true
+bool didYouWin(Gameboard& gameboard)
 {
     if (didYouWinRows(gameboard) &&
         didYouWinColumns(gameboard))
@@ -393,16 +407,15 @@ bool didYouWin(std::vector<std::vector<int>>& gameboard)
     return false;
 }
 
-// Tarkistaa voittotilanteen käymällä pelilaudan rivi riviltä läpi.
-// Voitto, mikäli kullakin rivillä on numeroa 1-5 maksimissaan kerran.
-bool didYouWinRows(std::vector<std::vector<int>>& gameboard)
+// Tarkistaa vaakariveiltä voittotilanteen.
+bool didYouWinRows(Gameboard& gameboard)
 {
-    // vaakarivit
     std::vector<int> row;
     for(int i = 0; i < 5; ++i)
     {
         row = gameboard.at(i);
 
+        // apumuuttujien avulla pidetään kirjaa numeroiden esiintymisestä riveillä
         int nr_1 = 0;
         int nr_2 = 0;
         int nr_3 = 0;
@@ -441,70 +454,40 @@ bool didYouWinRows(std::vector<std::vector<int>>& gameboard)
     return true;
 }
 
+// Tarkistaa onko sarakkeissa voittotilanne.
+bool didYouWinColumns(Gameboard& gameboard)
+{
+    // tallennetaan pelilauta väliaikaiseen tietorakenteeseen
+    // kääntäen sarakkeet riveiksi
+    std::vector<std::vector<int>> gameboard_swapped;
 
-bool didYouWinColumns(std::vector<std::vector<int>>& gameboard)
-{ // katsotaan pystyriveittäin, onko vain kerran
-
-    std::vector<int> column;
     for (int i = 0; i < 5; ++i)
-    {
+    {   std::vector<int> column;
         for (int j = 0; j < 5; ++j)
             {
                 column.push_back(gameboard.at(j).at(i));
             }
+        gameboard_swapped.push_back(column);
     }
 
-    int nr_1 = 0;
-    int nr_2 = 0;
-    int nr_3 = 0;
-    int nr_4 = 0;
-    int nr_5 = 0;
-
-    for (int nr : column)
-    {
-
-        if (nr == 1)
-        {
-            nr_1 +=1;
-        }
-        if (nr == 2)
-        {
-            nr_2 +=1;
-        }
-        if (nr == 3)
-        {
-            nr_3 +=1;
-        }
-        if (nr == 4)
-        {
-            nr_4 +=1;
-        }
-        if (nr == 5)
-        {
-            nr_5 +=1;
-        }
-
-    }
-
-    if (nr_1 > 1 || nr_2 > 1 || nr_3 > 1 || nr_4 > 1 || nr_5 > 1)
+    // tarkistetaan onko "uusilla riveillä" voittotilanne
+    if (not didYouWinRows(gameboard_swapped))
     {
         return false;
     }
-
     return true;
 }
 
 int main()
 {
-    std::vector<std::vector<int>> gameboard = createBoard();
+    Gameboard gameboard = createBoard();
     print(gameboard);
 
     string x = "";
     string y = "";
 
-
-    // peli jatkuu kunnes didyouwinistä tulee true tai didyoulosesta tulee true
-    // tai x - koordinaatti on q tai Q
+    // peli jatkuu kunnes käyttäjältä poistumiskäsky, pelilauta
+    // on voittotilanteessa tai häviävä siirto tehdään
     while (true)
     {
         askForCoordinates(x, y, gameboard);
@@ -520,13 +503,11 @@ int main()
             break;
         }
 
-        if (didYouLose(gameboard) || didYouLoseLonelySpace(gameboard))
+        if (didYouLose(gameboard))
         {
             cout << "You lost" << endl;
             break;
         }
-
-
     }
     return EXIT_SUCCESS;
 }
