@@ -27,10 +27,9 @@ int main()
         {
             ++first_letter;
             --last_letter;
+            shuffle(first_letter, last_letter, generator);
         }
 
-        shuffle(first_letter, last_letter, generator);
-	
         std::cout << word << std::endl;
     }
 
