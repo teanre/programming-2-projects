@@ -33,6 +33,5 @@ int main()
         outputf.close();
     }
 
-
-    return 0;
+    return EXIT_FAILURE;
 }
