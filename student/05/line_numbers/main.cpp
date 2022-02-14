@@ -15,15 +15,17 @@ int main()
     getline(cin, output_file);
 
     ifstream inputf(input_file);
-    ofstream outputf(output_file);
+
     if (not inputf)
     {
         cout << "Error! The file " << input_file << " cannot be opened." << endl;
+        return EXIT_FAILURE;
     }
     else
     {
         string row;
         int row_number = 1;
+        ofstream outputf(output_file);
         while ( getline (inputf, row))
         {
             outputf << row_number << " " <<  row << endl;
