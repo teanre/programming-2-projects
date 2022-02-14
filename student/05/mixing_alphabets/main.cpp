@@ -20,6 +20,7 @@ int main()
         }
 
         // TODO: implement your solution here
+        shuffle(word.begin(), word.end(), generator);
 	
         std::cout << word << std::endl;
     }
