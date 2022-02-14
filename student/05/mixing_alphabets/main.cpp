@@ -22,11 +22,17 @@ int main()
         // TODO: implement your solution here
         std::string::iterator first_letter = word.begin();
         std::string::iterator last_letter = word.end();
-        ++first_letter;
-        --last_letter;
+
+        if (word.size() > 2)
+        {
+            ++first_letter;
+            --last_letter;
+        }
 
         shuffle(first_letter, last_letter, generator);
 	
         std::cout << word << std::endl;
     }
+
+    return EXIT_SUCCESS;
 }
