@@ -3,10 +3,12 @@
 #include <map>
 #include <vector>
 #include <fstream>
+#include <set>
 
 using namespace std;
 
-using Wordcount = map<string, vector<int>>;
+//using Wordcount = map<string, vector<int>>;
+using Wordcount = map<string, set<int>>;
 
 
 std::vector <std::string> split(std::string const& text,
@@ -51,70 +53,46 @@ void add_word(Wordcount& wrds, const string& word, const int& pagenr)
     {
         wrds.insert( {word, { pagenr }} );
 
-    // Otherwise we'll just add a new page number to the vector
+    // Otherwise we'll just add a new page number to the set
     }
     else
     {
-        wrds.at(word).push_back(pagenr);
+        wrds.at(word).insert(pagenr);
     }
 }
 
-void print_pagenr_vector(const vector<int>& pagenumbers)
+void print_pagenr_set(const set<int>& pagenumbers)
 {
     cout << pagenumbers.size() << ": ";
-    /*vector<int>::const_iterator iter;
+
+    set<int>::const_iterator iter;
     iter = pagenumbers.begin();
-    while( iter != pagenumbers.end() )
-    {
-        cout << *iter << ", " << endl;
-        ++iter;
-    }*/
-    //An alternative implementation:
-    /*for ( const auto& pagenr : pagenumbers )
-    {
-         cout << pagenr << ",";
-    }*/
+    set<int>::const_iterator last_nr = pagenumbers.end();
 
-    for ( uint i = 0; i < pagenumbers.size(); ++i)
+    for (iter; iter != pagenumbers.end(); ++iter)
     {
-        if (i == pagenumbers.size()-1)
+        cout << *iter;
+        if ((++iter) != last_nr)
         {
-            cout << pagenumbers.at(i);
+            cout << ", ";
         }
-        else
-        {
-        cout << pagenumbers.at(i) << ", ";
-        }
+        --iter;
     }
-
 }
 
 void print_info(Wordcount& wordinfo)
 {
     //tulostaa: sana , kuinka monella rivillä esiintyy eli sitä vastaavan vektorin pituus
     // ja ite rivit millä sijaitsee eli sitä vastaavan vektorin sisältö
-    /*Wordcount::iterator iter;
-    iter = wordinfo.begin();
-    while( iter != wordinfo.end() )
-    {
-        cout << iter->first;
-        ++iter;
-        print_pagenr_vector(iter->second);
-    }*/
 
-    // Or alternatively:
     for ( const auto& pagenrdata : wordinfo )
     {
         cout << pagenrdata.first << " ";
 
-        print_pagenr_vector(pagenrdata.second);
+        print_pagenr_set(pagenrdata.second);
         cout << endl;
     }
-
-
 }
-
-
 
 
 int main()
@@ -144,23 +122,20 @@ int main()
 
         while ( getline (inputf, row))
         {
-            //splitataan rivilta " ", laitetaan mappiin sana, vektoriin row_number
+            //splitataan rivilta " ", laitetaan mappiin sana, settiin row_number
             std::vector<string> words = split(row);
 
-            //for loopilla words-vektori läpi, lisätään mappiin?
             for (string& word : words)
             {
                add_word(worderssons, word, row_number);
-               //cout << word << endl;
             }
             row_number += 1;
         }
         inputf.close();
      }
 
-    // tulostaminen
-    print_info(worderssons);
 
+    print_info(worderssons);
 
     return EXIT_SUCCESS;
 }
