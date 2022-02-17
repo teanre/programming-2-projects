@@ -65,11 +65,9 @@ void print_pagenr_set(const set<int>& pagenumbers)
 {
     cout << pagenumbers.size() << ": ";
 
-    set<int>::const_iterator iter;
-    iter = pagenumbers.begin();
     set<int>::const_iterator last_nr = pagenumbers.end();
 
-    for (iter; iter != pagenumbers.end(); ++iter)
+    for (set<int>::const_iterator iter = pagenumbers.begin(); iter != pagenumbers.end(); ++iter)
     {
         cout << *iter;
         if ((++iter) != last_nr)
