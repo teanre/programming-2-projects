@@ -32,30 +32,71 @@ std::vector<std::string> split(const std::string& s,
     return result;
 }
 
-void save_data(Database& database,
-               const std::string& id1, const std::string& id2)
+void save_data(const std::string id1, const std::string id2, Database& database)
 {
-
-    std::vector<std::string> underlings;
-    underlings.push_back(id2);
-
-    database.insert( {id1, underlings});
-
+    if (database.find(id1) == database.end())
+    {
+        database.insert( {id1, {}});
+    }
+    database.at(id1).push_back(id2);
 }
 
-void print(Database& database, std::string id)
+void print(const std::string id, Database const& database, std::string indent = "")
 {
-    //
+    //jos hlöä ei ole tallennettuna, tai henkilöllä ei ole rekrytoituja
+    if (database.find(id) == database.end()
+            || database.at(id).empty())
+    {
+        std::cout <<  indent << id << std::endl;
+    }
+
+    //muuten pitää tulostaa henkilö aliverkostoineen
+    else
+    {
+        std::cout << indent << id << std::endl;
+        std::vector<std::string>::const_iterator iter = database.at(id).begin();
+        for (; iter!=database.at(id).end(); ++iter)
+        {
+            print(*iter, database, indent + "..");
+        }
+    }
 }
 
-void count(std::string id)
+int count(std::string id, Database const& database)
 {
-
+    //triviaali, ei rekryttyjä eli ei ole mapissa avaimena
+    if (database.find(id) == database.end())
+    {
+        return 0;
+    }
+    else
+    {
+       // lasketaan kutakin nimeä koskevan vektorin pituus
+        std::vector<std::string>::const_iterator iter = database.at(id).begin();
+        int size = database.at(id).size();
+        for(; iter != database.at(id).end(); ++iter)
+        {
+            size += count(*iter, database);
+        }
+        return size;
+    }
 }
 
-void depth(std::string id)
+int depth(std::string id, const Database& database)
 {
+    int max_depth = 0;
 
+    if (database.find(id) != database.end())
+    {
+        for (std::string key : database.at(id))
+        {
+            if(depth(key, database) > max_depth)
+            {
+                max_depth = depth(key, database);
+            }
+        }
+    }
+    return max_depth +1;
 }
 
 int main()
@@ -89,7 +130,7 @@ int main()
             std::string id2 = parts.at(2);
 
             // TODO: Implement the command here!
-            save_data(database, id1, id2);
+            save_data(id1, id2, database);
 
         }
         else if(command == "P" or command == "p")
@@ -102,6 +143,7 @@ int main()
             std::string id = parts.at(1);
 
             // TODO: Implement the command here!
+            print(id, database);
 
         }
         else if(command == "C" or command == "c")
@@ -114,6 +156,7 @@ int main()
             std::string id = parts.at(1);
 
             // TODO: Implement the command here!
+            std::cout << count(id, database) << std::endl;
 
         }
         else if(command == "D" or command == "d")
@@ -126,6 +169,7 @@ int main()
             std::string id = parts.at(1);
 
             // TODO: Implement the command here!
+            std::cout << depth(id, database) << std::endl;
 
         }
         else if(command == "Q" or command == "q")
