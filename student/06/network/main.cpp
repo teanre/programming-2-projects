@@ -2,10 +2,12 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <map>
 
 const std::string HELP_TEXT = "S = store id1 i2\nP = print id\n"
                               "C = count id\nD = depth id\n";
 
+using Database = std::map<std::string, std::vector <std::string>>;
 
 std::vector<std::string> split(const std::string& s,
                                const char delimiter,
@@ -30,10 +32,36 @@ std::vector<std::string> split(const std::string& s,
     return result;
 }
 
+void save_data(Database& database,
+               const std::string& id1, const std::string& id2)
+{
+
+    std::vector<std::string> underlings;
+    underlings.push_back(id2);
+
+    database.insert( {id1, underlings});
+
+}
+
+void print(Database& database, std::string id)
+{
+    //
+}
+
+void count(std::string id)
+{
+
+}
+
+void depth(std::string id)
+{
+
+}
+
 int main()
 {
     // TODO: Implement the datastructure here
-
+    Database database = {};
 
     while(true)
     {
@@ -61,6 +89,7 @@ int main()
             std::string id2 = parts.at(2);
 
             // TODO: Implement the command here!
+            save_data(database, id1, id2);
 
         }
         else if(command == "P" or command == "p")
