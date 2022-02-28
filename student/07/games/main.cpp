@@ -31,6 +31,7 @@ const std::string FILE_OPEN_ERROR_MSG = "Error: File could not be read.";
 const std::string INVALID_FORMAT_ERROR_MSG = "Error: Invalid format in file";
 const std::string INVALID_INPUT_ERROR_MSG = "Error: Invalid input.";
 const std::string GAME_NOT_FOUND_ERROR_MSG = "Error: Game could not be found.";
+const std::string PLAYER_NOT_FOUND_ERROR_MSG = "Error: Player could not be found.";
 
 // Casual split func, if delim char is between "'s, ignores it.
 std::vector<std::string> split( const std::string& str, char delim = ';' )
@@ -128,6 +129,7 @@ void convert_to_upper(std::string& input)
     }
 }
 
+// returns false if quit is given as input
 bool ask_for_command(std::vector<std::string>& command_and_parametres )
 {
     std::string input = "";
@@ -138,11 +140,7 @@ bool ask_for_command(std::vector<std::string>& command_and_parametres )
     std::string command = command_and_parametres.at(0);
 
     convert_to_upper(command);
-    if (command == "QUIT")
-    {
-        return false;
-    }
-    return true;
+    return command != "QUIT";
 }
 
 void print_all_games(GAMES& gamestatistics)
@@ -157,66 +155,63 @@ void print_all_games(GAMES& gamestatistics)
     }
 }
 
-void game(GAMES& gamestatistics, const std::string& gamename)
+std::map<int, std::vector<std::string>> save_scores_per_game
+        (GAMES& gamestatistics, const std::string& gamename)
 {
-    if (gamestatistics.find(gamename) == gamestatistics.end())
+    // käydään läpi ko. peliä koskeva tulokset, tehään mappi jossa pisteet ja vektori nimistä
+    std::map<int, std::vector<std::string>> sort_by_score;
+    //tää antaa peliä vastaavat pelaajat ja pojot
+    std::map<std::string, int> players_and_scores = gamestatistics.at(gamename);
+
+    for (auto info : players_and_scores)
     {
-        std::cout << GAME_NOT_FOUND_ERROR_MSG << std::endl;
-    }
-    else
-    {
-        std::cout << "Game " << gamename <<  " has these scores and players,"
-                " listed in ascending order:" << std::endl;
-
-        // käydään läpi ko. peliä koskeva tulokset, tehään mappi jossa pisteet ja vektori nimistä
-        std::map<int, std::vector<std::string>> sort_by_score;
-        //tää antaa peliä vastaavat pelaajat ja pojot
-        std::map<std::string, int> players_and_scores = gamestatistics.at(gamename);
-
-        for (auto info : players_and_scores)
+        //jos pisteitä ei oo vielä mapissa
+        if ( sort_by_score.find(info.second) == sort_by_score.end())
         {
-            //jos pisteitä ei oo vielä mapissa
-            if ( sort_by_score.find(info.second) == sort_by_score.end())
-            {
-                sort_by_score.insert( {info.second, {}});
-            }
-            // muuten lisätään vaan pelaajat joilla samat pisteet
-            sort_by_score.at(info.second).push_back(info.first);
+            sort_by_score.insert( {info.second, {}});
         }
-
-        //tulostaminen
-        for (auto& pts : sort_by_score)
-        {
-            //ensin tulostetaan pistemäärä
-            std::cout << pts.first << " : ";
-
-            std::vector<std::string>::iterator last_player
-                                            = sort_by_score.at(pts.first).end();
-            std::vector<std::string>::iterator iter
-                                            = sort_by_score.at(pts.first).begin();
-            for (; iter != sort_by_score.at(pts.first).end(); ++iter)
-            {
-                std::cout << *iter;
-                if ((++iter) != last_player)
-                {
-                    std::cout << ", ";
-                }
-                --iter;
-            }
-            //sitten pelaajat
-
-            /*std::vector<std::string> players = pts.second;
-            for(auto& name : players)
-            {
-                std::cout << name << std::endl;
-            }*/
-        }
+        // muuten lisätään vaan pelaajat joilla samat pisteet
+        sort_by_score.at(info.second).push_back(info.first);
     }
+    return sort_by_score;
 }
 
-void print_all_players(GAMES& gamestatistics)
+void print_scores_per_game(GAMES& gamestatistics, std::string gamename)
 {
-    // safe info of players in set, so there is no duplicates
+    std::map<int, std::vector<std::string>> sort_by_score =
+            save_scores_per_game(gamestatistics, gamename);
+
+    std::cout << "Game " << gamename <<  " has these scores and players,"
+                " listed in ascending order:" << std::endl;
+
+    for (auto& pts : sort_by_score)
+    {
+        //ensin tulostetaan pistemäärä
+        std::cout << pts.first << " : ";
+
+        std::vector<std::string>::iterator last_player
+                                            = sort_by_score.at(pts.first).end();
+        std::vector<std::string>::iterator iter
+                                            = sort_by_score.at(pts.first).begin();
+        for (; iter != sort_by_score.at(pts.first).end(); ++iter)
+        {
+            std::cout << *iter;
+            if ((++iter) != last_player)
+            {
+                std::cout << ", ";
+            }
+            else
+            {
+                std::cout << std::endl;
+            }
+            --iter;
+            }
+        }
+}
+
+std::set<std::string> save_names_of_all_players(GAMES& gamestatistics)
+{
+    // save info of players in set, so there is no duplicates
     std::set<std::string> players;
 
     for (auto& info : gamestatistics)
@@ -228,13 +223,43 @@ void print_all_players(GAMES& gamestatistics)
             players.insert(name.first);
         }
     }
+    return players;
+}
 
-    for (std::set<std::string>::iterator iter = players.begin(); iter != players.end(); ++iter)
+void print_all_players(std::set<std::string>& players)
+{
+    for (std::set<std::string>::iterator iter = players.begin();
+         iter != players.end(); ++iter)
     {
         std::cout << *iter << std::endl;
     }
 }
 
+void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
+{
+    std::set<std::string> games_played;
+
+    for (auto& info : gamestatistics)
+    {
+        std::map<std::string, int> playerdata = info.second;
+        for(auto& name : playerdata)
+        {
+            // if name is found in the statistics of the game
+            // add the name of the game to set
+            if ( playerdata.find(name_of_player) != playerdata.end())
+            {
+                games_played.insert(info.first);
+            }
+        }
+    }
+
+    std::cout << "Player " << name_of_player << " plays the following games:" << std::endl;
+    for (std::string game : games_played)
+    {
+        std::cout << game << std::endl;
+    }
+
+}
 
 int main()
 {
@@ -258,11 +283,39 @@ int main()
         }
         else if (command == "GAME")
         {
-            game(gamestatistics, command_and_parametres.at(1));
+            if (gamestatistics.find(command_and_parametres.at(1)) == gamestatistics.end())
+            {
+                std::cout << GAME_NOT_FOUND_ERROR_MSG << std::endl;
+            }
+            else if(command_and_parametres.size() <2)
+            {
+                std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+            }
+            print_scores_per_game(gamestatistics, command_and_parametres.at(1));
         }
         else if (command == "ALL_PLAYERS")
         {
-            print_all_players(gamestatistics);
+            std::set<std::string> players
+                    = save_names_of_all_players(gamestatistics);
+            print_all_players(players);
+        }
+        else if (command == "PLAYER")
+        {
+            std::set<std::string> players
+                    = save_names_of_all_players(gamestatistics);
+            if(command_and_parametres.size() <2)
+            {
+                std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+            }
+            else if (players.find(command_and_parametres.at(1))
+                     == players.end())
+            {
+                std::cout << PLAYER_NOT_FOUND_ERROR_MSG << std::endl;
+            }
+            else
+            {
+                print_player_stats(gamestatistics, command_and_parametres.at(1));
+            }
         }
     }
     return EXIT_SUCCESS;
