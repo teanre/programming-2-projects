@@ -17,6 +17,7 @@
  *
  * */
 #include <iostream>
+#include <cctype>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -117,39 +118,40 @@ bool open_file(GAMES& gamestatistics)
     return true;
 }
 
-/*void read_file(GAMES& gamestatistics)
+
+
+// converts the input given by user to upper characters
+void convert_to_upper(std::string& input)
 {
-
-    std::string line;
-
-    std::vector<std::string> data;
-
-    while( getline (file_object, line) )
+    for (uint i = 0; i < input.length(); ++i)
     {
-        data = split(line);
-        if (data.size() > 3
-         || data.at(0) == EMPTY_INPUT
-         || data.at(1) == EMPTY_INPUT)
-        {
-            std::cout << INVALID_FORMAT_ERROR_MSG << std::endl;
-            return false;
-        }
-        else
-        {
-
-        }
-}*/
-
-
-
-std::string ask_for_command()
-{
-    std::string command = "";
-    std::cout << "games>";
-    getline(std::cin, command);
-    return command;
+        input.at(i) = toupper(input.at(i));
+    }
 }
 
+bool ask_for_command(std::string& command)
+{
+    std::cout << "games>";
+    getline(std::cin, command);
+    convert_to_upper(command);
+    if (command == "QUIT")
+    {
+        return false;
+    }
+    return true;
+}
+
+void all_games(GAMES& gamestatistics)
+{
+    GAMES::iterator iter;
+    iter = gamestatistics.begin();
+    std::cout << "All games in alphabetical order:" << std::endl;
+    while ( iter != gamestatistics.end() )
+    {
+        std::cout << iter->first << std::endl;
+        ++iter;
+    }
+}
 
 int main()
 {
@@ -160,11 +162,15 @@ int main()
         return EXIT_FAILURE;
     }
 
-    if (ask_for_command() == "QUIT")
+    std::string command = "";
+    while (ask_for_command(command))
     {
-        return EXIT_FAILURE;
+        convert_to_upper(command);
+
+        if (command == "ALL_GAMES")
+        {
+            all_games(gamestatistics);
+        }
     }
-
-
     return EXIT_SUCCESS;
 }
