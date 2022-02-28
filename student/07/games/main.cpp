@@ -19,6 +19,7 @@
 #include <iostream>
 #include <cctype>
 #include <fstream>
+#include <set>
 #include <string>
 #include <vector>
 #include <map>
@@ -28,6 +29,8 @@ using GAMES = std::map<std::string, std::map<std::string, int>>;
 
 const std::string FILE_OPEN_ERROR_MSG = "Error: File could not be read.";
 const std::string INVALID_FORMAT_ERROR_MSG = "Error: Invalid format in file";
+const std::string INVALID_INPUT_ERROR_MSG = "Error: Invalid input.";
+const std::string GAME_NOT_FOUND_ERROR_MSG = "Error: Game could not be found.";
 
 // Casual split func, if delim char is between "'s, ignores it.
 std::vector<std::string> split( const std::string& str, char delim = ';' )
@@ -108,16 +111,12 @@ bool open_file(GAMES& gamestatistics)
                 gamestatistics.insert( {game, {}} );
             }
             //muuten lisätään pelaajan tiedot peliin
-            else
-            {
-                gamestatistics.at(game).insert({player, points});
-            }
-
+            gamestatistics.at(game).insert({player, points});
          }
+        file_object.close();
     }
     return true;
 }
-
 
 
 // converts the input given by user to upper characters
@@ -129,10 +128,15 @@ void convert_to_upper(std::string& input)
     }
 }
 
-bool ask_for_command(std::string& command)
+bool ask_for_command(std::vector<std::string>& command_and_parametres )
 {
+    std::string input = "";
     std::cout << "games>";
-    getline(std::cin, command);
+    getline(std::cin, input);
+
+    command_and_parametres = split(input, ' ');
+    std::string command = command_and_parametres.at(0);
+
     convert_to_upper(command);
     if (command == "QUIT")
     {
@@ -141,7 +145,7 @@ bool ask_for_command(std::string& command)
     return true;
 }
 
-void all_games(GAMES& gamestatistics)
+void print_all_games(GAMES& gamestatistics)
 {
     GAMES::iterator iter;
     iter = gamestatistics.begin();
@@ -153,6 +157,85 @@ void all_games(GAMES& gamestatistics)
     }
 }
 
+void game(GAMES& gamestatistics, const std::string& gamename)
+{
+    if (gamestatistics.find(gamename) == gamestatistics.end())
+    {
+        std::cout << GAME_NOT_FOUND_ERROR_MSG << std::endl;
+    }
+    else
+    {
+        std::cout << "Game " << gamename <<  " has these scores and players,"
+                " listed in ascending order:" << std::endl;
+
+        // käydään läpi ko. peliä koskeva tulokset, tehään mappi jossa pisteet ja vektori nimistä
+        std::map<int, std::vector<std::string>> sort_by_score;
+        //tää antaa peliä vastaavat pelaajat ja pojot
+        std::map<std::string, int> players_and_scores = gamestatistics.at(gamename);
+
+        for (auto info : players_and_scores)
+        {
+            //jos pisteitä ei oo vielä mapissa
+            if ( sort_by_score.find(info.second) == sort_by_score.end())
+            {
+                sort_by_score.insert( {info.second, {}});
+            }
+            // muuten lisätään vaan pelaajat joilla samat pisteet
+            sort_by_score.at(info.second).push_back(info.first);
+        }
+
+        //tulostaminen
+        for (auto& pts : sort_by_score)
+        {
+            //ensin tulostetaan pistemäärä
+            std::cout << pts.first << " : ";
+
+            std::vector<std::string>::iterator last_player
+                                            = sort_by_score.at(pts.first).end();
+            std::vector<std::string>::iterator iter
+                                            = sort_by_score.at(pts.first).begin();
+            for (; iter != sort_by_score.at(pts.first).end(); ++iter)
+            {
+                std::cout << *iter;
+                if ((++iter) != last_player)
+                {
+                    std::cout << ", ";
+                }
+                --iter;
+            }
+            //sitten pelaajat
+
+            /*std::vector<std::string> players = pts.second;
+            for(auto& name : players)
+            {
+                std::cout << name << std::endl;
+            }*/
+        }
+    }
+}
+
+void print_all_players(GAMES& gamestatistics)
+{
+    // safe info of players in set, so there is no duplicates
+    std::set<std::string> players;
+
+    for (auto& info : gamestatistics)
+    {
+        std::map<std::string, int> playerdata = info.second;
+        for(auto& name : playerdata)
+        {
+            //lisätään pelaajan nimi settiin
+            players.insert(name.first);
+        }
+    }
+
+    for (std::set<std::string>::iterator iter = players.begin(); iter != players.end(); ++iter)
+    {
+        std::cout << *iter << std::endl;
+    }
+}
+
+
 int main()
 {
     GAMES gamestatistics;
@@ -162,14 +245,24 @@ int main()
         return EXIT_FAILURE;
     }
 
-    std::string command = "";
-    while (ask_for_command(command))
+    std::vector<std::string> command_and_parametres;
+
+    while (ask_for_command(command_and_parametres))
     {
+        std::string command = command_and_parametres.at(0);
         convert_to_upper(command);
 
         if (command == "ALL_GAMES")
         {
-            all_games(gamestatistics);
+            print_all_games(gamestatistics);
+        }
+        else if (command == "GAME")
+        {
+            game(gamestatistics, command_and_parametres.at(1));
+        }
+        else if (command == "ALL_PLAYERS")
+        {
+            print_all_players(gamestatistics);
         }
     }
     return EXIT_SUCCESS;
