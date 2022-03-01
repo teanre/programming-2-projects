@@ -168,10 +168,11 @@ void print_all_games(GAMES& gamestatistics)
 std::map<int, std::vector<std::string>> save_scores_per_game
         (GAMES& gamestatistics, const std::string& gamename)
 {
-    // käydään läpi ko. peliä koskeva tulokset, tehään mappi jossa pisteet ja vektori nimistä
-    std::map<int, std::vector<std::string>> sort_by_score;
     //tää antaa peliä vastaavat pelaajat ja pojot
     std::map<std::string, int> players_and_scores = gamestatistics.at(gamename);
+
+    // käydään läpi ko. peliä koskeva tulokset, tehään mappi jossa pisteet ja vektori nimistä
+    std::map<int, std::vector<std::string>> sort_by_score;
 
     for (auto info : players_and_scores)
     {
@@ -200,9 +201,9 @@ void print_scores_per_game(GAMES& gamestatistics, std::string gamename)
         std::cout << pts.first << " : ";
 
         std::vector<std::string>::iterator last_player
-                                            = sort_by_score.at(pts.first).end();
+                                         = sort_by_score.at(pts.first).end();
         std::vector<std::string>::iterator iter
-                                            = sort_by_score.at(pts.first).begin();
+                                         = sort_by_score.at(pts.first).begin();
         for (; iter != sort_by_score.at(pts.first).end(); ++iter)
         {
             std::cout << *iter;
@@ -305,18 +306,27 @@ void add_player(GAMES& gamestatistics, std::string& game,
 
 void remove_player(GAMES& gamestatistics, std::string& player)
 {
-    // go through database and delete player from all games
-    for (auto& info : gamestatistics)
+    GAMES::iterator iter;
+    iter = gamestatistics.begin();
+
+    while (iter != gamestatistics.end())
     {
-        std::map<std::string, int> playerdata = info.second;
-        for (auto& data : playerdata)
+        std::map<std::string, int>& apuri = iter->second;
+        std::map<std::string, int>::iterator iteri;
+        iteri = apuri.begin();
+        while (iteri != apuri.end())
         {
-            if (playerdata.find(player) != playerdata.end())
+            std::cout << iteri->first << std::endl;
+            if (iteri->first == player)
             {
-                playerdata.erase(player);
+                iteri = apuri.erase(iteri);
             }
-            std::cout << data.first << std::endl;
+            else
+            {
+                ++iteri;
+            }
         }
+        ++iter;
     }
 }
 
