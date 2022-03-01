@@ -32,10 +32,8 @@ const std::string INVALID_FORMAT_ERROR_MSG = "Error: Invalid format in file.";
 const std::string INVALID_INPUT_ERROR_MSG = "Error: Invalid input.";
 const std::string GAME_NOT_FOUND_ERROR_MSG = "Error: Game could not be found.";
 const std::string PLAYER_NOT_FOUND_ERROR_MSG = "Error: Player could not be found.";
-
-//enum Commands {QUIT, ALL_GAMES, GAME, ALL_PLAYERS, PLAYER, ADD_GAME,
-  //            ADD_PLAYER, REMOVE};
-//jos ei ole komentojen joukossa, tulostetaan error-msg
+const std::string ALREADY_EXISTS_ERROR_MSG = "Error: Already exists." ;
+const std::string PLAYER_ADDED_MSG = "Player was added.";
 
 std::set<std::string> COMMANDS = {"QUIT", "ALL_GAMES", "GAME", "ALL_PLAYERS",
                                      "PLAYER""", "ADD_GAME", "ADD_PLAYER", "REMOVE"};
@@ -77,6 +75,20 @@ bool line_is_ok(std::vector<std::string> const& data)
         && !data.at(1).empty();
 }
 
+
+void save_game_stats(GAMES& gamestatistics, std::string& game,
+                std::string& player, std::string pts_as_string)
+{
+    int points = stoi(pts_as_string);
+    //jos peliä ei ole vielä tietokannassa, alustetaan
+    if (gamestatistics.find(game) == gamestatistics.end() )
+    {
+        gamestatistics.insert( {game, {}} );
+    }
+    //muuten lisätään pelaajan tiedot peliin
+    gamestatistics.at(game).insert({player, points});
+}
+
 // Opens the file and saves the data
 bool open_file(GAMES& gamestatistics)
 {
@@ -92,39 +104,29 @@ bool open_file(GAMES& gamestatistics)
         std::cout << FILE_OPEN_ERROR_MSG << std::endl;
         return false;
     }
-
     else
     {
         std::string line;
         std::vector<std::string> data;
-
         while( getline (file_object, line) )
         {
             data = split(line);
-
             if (!line_is_ok(data))
             {
                 std::cout << INVALID_FORMAT_ERROR_MSG << std::endl;
                 return false;
             }
-
             std::string game = data.at(0),
                         player = data.at(1),
                         pts_as_string = data.at(2);
-            int points = stoi(pts_as_string);
 
-            //jos peliä ei ole vielä tilastossa, lisätään
-            if (gamestatistics.find(game) == gamestatistics.end() )
-            {
-                gamestatistics.insert( {game, {}} );
-            }
-            //muuten lisätään pelaajan tiedot peliin
-            gamestatistics.at(game).insert({player, points});
+            save_game_stats(gamestatistics, game, player, pts_as_string);
          }
         file_object.close();
     }
     return true;
 }
+
 
 
 // converts the input given by user to upper characters
@@ -260,12 +262,43 @@ void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
         }
     }
 
-    std::cout << "Player " << name_of_player << " plays the following games:" << std::endl;
+    std::cout << "Player " << name_of_player <<
+                 " plays the following games:" << std::endl;
     for (const std::string &game : games_played)
     {
         std::cout << game << std::endl;
     }
 
+}
+
+void add_game(GAMES& gamestatistics, std::string& gamename)
+{
+    if (gamestatistics.find(gamename) == gamestatistics.end() )
+    {
+        gamestatistics.insert( {gamename, {}} );
+        std::cout << "Game was added." << std::endl;
+    }
+    else
+    {
+        std::cout << ALREADY_EXISTS_ERROR_MSG << std::endl;
+    }
+}
+
+void add_player(GAMES& gamestatistics, std::string& game,
+                std::string& player, std::string pts_as_string)
+{
+    int pts = stoi(pts_as_string);
+    //jos pelaaja on jo listassa, päivitetään
+    if (save_names_of_all_players(gamestatistics).find(player) !=
+            save_names_of_all_players(gamestatistics).end())
+    {
+        //std::map<std::string, int> info = {{player, pts}};
+        gamestatistics[game][player] =  pts;
+    }
+    else
+    {
+        save_game_stats(gamestatistics, game, player, pts_as_string);
+    }
 }
 
 int main()
@@ -283,6 +316,8 @@ int main()
     {
         std::string command = command_and_parametres.at(0);
         convert_to_upper(command);
+
+        // if incorrect command is given
         if (COMMANDS.find(command) == COMMANDS.end())
         {
             std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
@@ -301,7 +336,10 @@ int main()
             {
                 std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
             }
-            print_scores_per_game(gamestatistics, command_and_parametres.at(1));
+            else
+            {
+                print_scores_per_game(gamestatistics, command_and_parametres.at(1));
+            }
         }
         else if (command == "ALL_PLAYERS")
         {
@@ -325,6 +363,36 @@ int main()
             else
             {
                 print_player_stats(gamestatistics, command_and_parametres.at(1));
+            }
+        }
+        else if (command == "ADD_GAME")
+        {
+            if (command_and_parametres.size() <2)
+            {
+                std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+            }
+            else
+            {
+                add_game(gamestatistics, command_and_parametres.at(1));
+            }
+        }
+        else if (command == "ADD_PLAYER")
+        {
+            if (command_and_parametres.size() <4)
+            {
+                std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+            }
+            else if (gamestatistics.find(command_and_parametres.at(1))
+                     == gamestatistics.end())
+            {
+                std::cout << GAME_NOT_FOUND_ERROR_MSG << std::endl;
+            }
+            else
+            {
+                add_player(gamestatistics, command_and_parametres.at(1),
+                                command_and_parametres.at(2),
+                                command_and_parametres.at(3));
+                std::cout << PLAYER_ADDED_MSG << std::endl;
             }
         }
     }
