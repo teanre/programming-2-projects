@@ -34,6 +34,7 @@ const std::string GAME_NOT_FOUND_ERROR_MSG = "Error: Game could not be found.";
 const std::string PLAYER_NOT_FOUND_ERROR_MSG = "Error: Player could not be found.";
 const std::string ALREADY_EXISTS_ERROR_MSG = "Error: Already exists." ;
 const std::string PLAYER_ADDED_MSG = "Player was added.";
+const std::string PLAYER_REMOVED_MSG = "Player was removed from all games.";
 
 std::set<std::string> COMMANDS = {"QUIT", "ALL_GAMES", "GAME", "ALL_PLAYERS",
                                      "PLAYER""", "ADD_GAME", "ADD_PLAYER", "REMOVE"};
@@ -237,6 +238,8 @@ std::set<std::string> save_names_of_all_players(GAMES& gamestatistics)
 
 void print_all_players(std::set<std::string>& players)
 {
+    std::cout << "All players in alphabetical order:" << std::endl;
+
     for (std::set<std::string>::iterator iter = players.begin();
          iter != players.end(); ++iter)
     {
@@ -263,7 +266,7 @@ void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
     }
 
     std::cout << "Player " << name_of_player <<
-                 " plays the following games:" << std::endl;
+                 " playes the following games:" << std::endl;
     for (const std::string &game : games_played)
     {
         std::cout << game << std::endl;
@@ -288,16 +291,32 @@ void add_player(GAMES& gamestatistics, std::string& game,
                 std::string& player, std::string pts_as_string)
 {
     int pts = stoi(pts_as_string);
-    //jos pelaaja on jo listassa, päivitetään
+    // if player is already in database, only update the points
     if (save_names_of_all_players(gamestatistics).find(player) !=
             save_names_of_all_players(gamestatistics).end())
     {
-        //std::map<std::string, int> info = {{player, pts}};
         gamestatistics[game][player] =  pts;
     }
     else
     {
         save_game_stats(gamestatistics, game, player, pts_as_string);
+    }
+}
+
+void remove_player(GAMES& gamestatistics, std::string& player)
+{
+    // go through database and delete player from all games
+    for (auto& info : gamestatistics)
+    {
+        std::map<std::string, int> playerdata = info.second;
+        for (auto& data : playerdata)
+        {
+            if (playerdata.find(player) != playerdata.end())
+            {
+                playerdata.erase(player);
+            }
+            std::cout << data.first << std::endl;
+        }
     }
 }
 
@@ -327,14 +346,14 @@ int main()
             print_all_games(gamestatistics);
         }
         else if (command == "GAME")
-        {
-            if (gamestatistics.find(command_and_parametres.at(1)) == gamestatistics.end())
-            {
-                std::cout << GAME_NOT_FOUND_ERROR_MSG << std::endl;
-            }
-            else if(command_and_parametres.size() <2)
+        {        
+            if(command_and_parametres.size() <2)
             {
                 std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+            }
+            else if (gamestatistics.find(command_and_parametres.at(1)) == gamestatistics.end())
+            {
+                std::cout << GAME_NOT_FOUND_ERROR_MSG << std::endl;
             }
             else
             {
@@ -393,6 +412,25 @@ int main()
                                 command_and_parametres.at(2),
                                 command_and_parametres.at(3));
                 std::cout << PLAYER_ADDED_MSG << std::endl;
+            }
+        }
+        else if (command == "REMOVE")
+        {
+            std::set<std::string> players
+                    = save_names_of_all_players(gamestatistics);
+            if (command_and_parametres.size() <2)
+            {
+                std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+            }
+            else if (players.find(command_and_parametres.at(1))
+                     == players.end())
+            {
+                std::cout << PLAYER_NOT_FOUND_ERROR_MSG << std::endl;
+            }
+            else
+            {
+                remove_player(gamestatistics, command_and_parametres.at(1));
+                std::cout << PLAYER_REMOVED_MSG << std::endl;
             }
         }
     }
