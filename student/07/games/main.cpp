@@ -316,7 +316,6 @@ void remove_player(GAMES& gamestatistics, std::string& player)
         iteri = apuri.begin();
         while (iteri != apuri.end())
         {
-            std::cout << iteri->first << std::endl;
             if (iteri->first == player)
             {
                 iteri = apuri.erase(iteri);
