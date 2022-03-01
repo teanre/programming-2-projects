@@ -28,10 +28,17 @@
 using GAMES = std::map<std::string, std::map<std::string, int>>;
 
 const std::string FILE_OPEN_ERROR_MSG = "Error: File could not be read.";
-const std::string INVALID_FORMAT_ERROR_MSG = "Error: Invalid format in file";
+const std::string INVALID_FORMAT_ERROR_MSG = "Error: Invalid format in file.";
 const std::string INVALID_INPUT_ERROR_MSG = "Error: Invalid input.";
 const std::string GAME_NOT_FOUND_ERROR_MSG = "Error: Game could not be found.";
 const std::string PLAYER_NOT_FOUND_ERROR_MSG = "Error: Player could not be found.";
+
+//enum Commands {QUIT, ALL_GAMES, GAME, ALL_PLAYERS, PLAYER, ADD_GAME,
+  //            ADD_PLAYER, REMOVE};
+//jos ei ole komentojen joukossa, tulostetaan error-msg
+
+std::set<std::string> COMMANDS = {"QUIT", "ALL_GAMES", "GAME", "ALL_PLAYERS",
+                                     "PLAYER""", "ADD_GAME", "ADD_PLAYER", "REMOVE"};
 
 // Casual split func, if delim char is between "'s, ignores it.
 std::vector<std::string> split( const std::string& str, char delim = ';' )
@@ -133,7 +140,7 @@ void convert_to_upper(std::string& input)
 bool ask_for_command(std::vector<std::string>& command_and_parametres )
 {
     std::string input = "";
-    std::cout << "games>";
+    std::cout << "games> ";
     getline(std::cin, input);
 
     command_and_parametres = split(input, ' ');
@@ -254,7 +261,7 @@ void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
     }
 
     std::cout << "Player " << name_of_player << " plays the following games:" << std::endl;
-    for (std::string game : games_played)
+    for (const std::string &game : games_played)
     {
         std::cout << game << std::endl;
     }
@@ -276,8 +283,11 @@ int main()
     {
         std::string command = command_and_parametres.at(0);
         convert_to_upper(command);
-
-        if (command == "ALL_GAMES")
+        if (COMMANDS.find(command) == COMMANDS.end())
+        {
+            std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
+        }
+        else if (command == "ALL_GAMES")
         {
             print_all_games(gamestatistics);
         }
