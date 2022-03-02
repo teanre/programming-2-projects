@@ -32,7 +32,7 @@
 #include <vector>
 #include <map>
 
-// structure where game statistis are saved to {game{player, points}}
+// Data structure where game statistis are saved to {game, {player, points}}
 using GAMES = std::map<std::string, std::map<std::string, int>>;
 
 const std::string FILE_OPEN_ERROR_MSG = "Error: File could not be read.",
@@ -74,7 +74,8 @@ std::vector<std::string> split( const std::string& str, char delim = ';' )
     return result;
 }
 
-// Checks if the line of data from file is acceptable
+// Checks if the line of data from file is acceptable:
+// line has the three strings required and game name or player name is not empty
 bool line_is_ok(std::vector<std::string> const& data)
 {
     return data.size() == 3
@@ -82,11 +83,12 @@ bool line_is_ok(std::vector<std::string> const& data)
         && !data.at(1).empty();
 }
 
-// Adds the data to data structure
+// Adds the statistics to data structure
 void save_game_stats(GAMES& gamestatistics, std::string& game,
                 std::string& player, std::string pts_as_string)
 {
     int points = stoi(pts_as_string);
+
     // checks if game is in the data structure yet, adds game if not
     if (gamestatistics.find(game) == gamestatistics.end() )
     {
@@ -96,7 +98,7 @@ void save_game_stats(GAMES& gamestatistics, std::string& game,
     gamestatistics.at(game).insert({player, points});
 }
 
-// Opens the file
+// Opens the file, saves the data to data structure if possible.
 bool open_file(GAMES& gamestatistics)
 {
     std::string filename = "";
@@ -143,8 +145,8 @@ void convert_to_upper(std::string& input)
     }
 }
 
-// Returns false if quit is given as input
-bool ask_for_command(std::vector<std::string>& command_and_parametres)
+// Asks for input from user. Returns false if quit is given as input.
+bool ask_for_input(std::vector<std::string>& command_and_parametres)
 {
     std::string input = "";
     std::cout << "games> ";
@@ -154,7 +156,7 @@ bool ask_for_command(std::vector<std::string>& command_and_parametres)
     std::string command = command_and_parametres.at(0);
 
     convert_to_upper(command);
-    // if incorrect command is given
+    // if incorrect command is given, notify
     if (COMMANDS.find(command) == COMMANDS.end())
     {
         std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
@@ -175,24 +177,24 @@ void print_all_games(GAMES& gamestatistics)
     }
 }
 
-// Organizes the stats by one given game in form points, players
+// Organizes the stats by given game in form points, players
 std::map<int, std::vector<std::string>> save_scores_per_game
         (GAMES& gamestatistics, const std::string& gamename)
 {
     //tää antaa peliä vastaavat pelaajat ja pojot
     std::map<std::string, int> players_and_scores = gamestatistics.at(gamename);
 
-    // help data structure to reorganize the statistics
+    // data structure to reorganize the statistics
     std::map<int, std::vector<std::string>> sort_by_score;
 
     for (auto info : players_and_scores)
     {
-        //jos pisteitä ei oo vielä mapissa
+        // check if the points are in sort_by_score yet
         if ( sort_by_score.find(info.second) == sort_by_score.end())
         {
             sort_by_score.insert( {info.second, {}});
         }
-        // muuten lisätään vaan pelaajat joilla samat pisteet
+        // add the players who
         sort_by_score.at(info.second).push_back(info.first);
     }
     return sort_by_score;
@@ -208,13 +210,15 @@ void print_scores_per_game(GAMES& gamestatistics, std::string gamename)
 
     for (auto& stats : sort_by_score)
     {
-        //ensin tulostetaan pistemäärä
+        // first print the amount of the points
         std::cout << stats.first << " : ";
 
         std::vector<std::string>::iterator last_player
                                          = sort_by_score.at(stats.first).end();
         std::vector<std::string>::iterator iter
                                          = sort_by_score.at(stats.first).begin();
+
+        // prints the players that have the same points
         for (; iter != sort_by_score.at(stats.first).end(); ++iter)
         {
             std::cout << *iter;
@@ -231,6 +235,7 @@ void print_scores_per_game(GAMES& gamestatistics, std::string gamename)
         }
 }
 
+// Checks if the game given is in the data structure.
 bool search_game(GAMES& gamestatistics, std::string gamename)
 {
     if (gamestatistics.find(gamename) == gamestatistics.end())
@@ -241,7 +246,7 @@ bool search_game(GAMES& gamestatistics, std::string gamename)
     return true;
 }
 
-
+// Stores the names all all players in the data structure.
 std::set<std::string> save_names_of_all_players(GAMES& gamestatistics)
 {
     // save names of players in set, so there is no duplicates
@@ -258,6 +263,7 @@ std::set<std::string> save_names_of_all_players(GAMES& gamestatistics)
     return players;
 }
 
+
 void print_all_players(GAMES& gamestatistics)
 {
     std::set<std::string> players = save_names_of_all_players(gamestatistics);
@@ -271,7 +277,7 @@ void print_all_players(GAMES& gamestatistics)
     }
 }
 
-// checks if player is in any of the games
+// Checks if player is in the data structure (i.e. plays any of the games)
 bool search_player(GAMES& gamestatistics, std::string name)
 {
     std::set<std::string> players = save_names_of_all_players(gamestatistics);
@@ -283,12 +289,11 @@ bool search_player(GAMES& gamestatistics, std::string name)
     return true;
 }
 
-// Prints the games a player plays ( PLAYER-command )
+// Prints the games the given player plays ( PLAYER-command )
 void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
 {
-    // go through all of the statistics, if player is found in the statistics
-    // of the game the name of the game to games played
-
+    // go through all of the statistics, if player is found
+    // add the name of the game to games_played set
     std::set<std::string> games_played;
     for (auto& info : gamestatistics)
     {
@@ -302,6 +307,7 @@ void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
         }
     }
 
+    // prints the games in alphabetic order
     std::cout << "Player " << name_of_player <<
                  " playes the following games:" << std::endl;
     for (const std::string& game : games_played)
@@ -310,7 +316,7 @@ void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
     }
 }
 
-// Adds a game to the statistics
+// Adds the given game to the data structure.
 void add_game(GAMES& gamestatistics, std::string& gamename)
 {
     if (gamestatistics.find(gamename) == gamestatistics.end() )
@@ -326,7 +332,7 @@ void add_game(GAMES& gamestatistics, std::string& gamename)
     }
 }
 
-// Adds in the data structure the given player and their points for the given game
+// Adds the given player and points for the given game in the data structure.
 void add_player(GAMES& gamestatistics, std::string& game,
                 std::string& player, std::string pts_as_string)
 {
@@ -345,7 +351,7 @@ void add_player(GAMES& gamestatistics, std::string& game,
     std::cout << PLAYER_ADDED_MSG << std::endl;
 }
 
-// Removes the given player from the data structure (i.e. from all games)
+// Removes the given player from the data structure (i.e. from all games).
 void remove_player(GAMES& gamestatistics, std::string& player)
 {
     GAMES::iterator iter;
@@ -353,14 +359,14 @@ void remove_player(GAMES& gamestatistics, std::string& player)
 
     while (iter != gamestatistics.end())
     {
-        std::map<std::string, int>& apuri = iter->second;
+        std::map<std::string, int>& player_and_points = iter->second;
         std::map<std::string, int>::iterator it;
-        it = apuri.begin();
-        while (it != apuri.end())
+        it = player_and_points.begin();
+        while (it != player_and_points.end())
         {
             if (it->first == player)
             {
-                it = apuri.erase(it);
+                it = player_and_points.erase(it);
             }
             else
             {
@@ -372,7 +378,7 @@ void remove_player(GAMES& gamestatistics, std::string& player)
     std::cout << PLAYER_REMOVED_MSG << std::endl;
 }
 
-// Checks if user has given enough parametres to execute the command
+// Checks if user has given enough parametres to execute the command.
 bool is_enough_parametres(const std::string& command,
                           const std::vector<std::string>& commands)
 {
@@ -406,7 +412,7 @@ int main()
     //first key will be the command, rest the parametres for commands
     std::vector<std::string> command_and_parametres;
 
-    while (ask_for_command(command_and_parametres))
+    while (ask_for_input(command_and_parametres))
     {
         std::string command = command_and_parametres.at(0);
         convert_to_upper(command);
@@ -436,9 +442,9 @@ int main()
         {
             add_game(gamestatistics, command_and_parametres.at(1));
         }
-        else if (command == "ADD_PLAYER" &&
-                 search_game(gamestatistics, command_and_parametres.at(1))
-                 && is_enough_parametres(command, command_and_parametres))
+        else if (command == "ADD_PLAYER"
+                 && is_enough_parametres(command, command_and_parametres)
+                 && search_game(gamestatistics, command_and_parametres.at(1)))
         {
             add_player(gamestatistics, command_and_parametres.at(1),
                             command_and_parametres.at(2),
