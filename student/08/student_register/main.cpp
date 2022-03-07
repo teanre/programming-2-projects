@@ -96,10 +96,13 @@ void edit_phone_number(Student& s)
 
     std::cout << "Enter a new phone number: ";
     getline(std::cin, phone_number);
+    std::cout << std::endl;
 
-    //päivitetään tietorakenteeseen
-    s.phone_number = phone_number;
-
+    if (is_valid_phone_number(phone_number))
+    {
+        //päivitetään tietorakenteeseen
+        s.phone_number = phone_number;
+    }
 }
 
 void save_to_file(const std::string& file_name,
