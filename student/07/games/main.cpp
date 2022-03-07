@@ -32,7 +32,7 @@
 #include <vector>
 #include <map>
 
-// Data structure where game statistis are saved to {game, {player, points}}
+// Data structure where game statistics are saved to {game, {player, points}}
 using GAMES = std::map<std::string, std::map<std::string, int>>;
 
 const std::string FILE_OPEN_ERROR_MSG = "Error: File could not be read.",
@@ -83,13 +83,13 @@ bool line_is_ok(std::vector<std::string> const& data)
         && !data.at(1).empty();
 }
 
-// Adds the statistics to data structure
+// Adds the statistics to data structure.
 void save_game_stats(GAMES& gamestatistics, std::string& game,
                 std::string& player, std::string pts_as_string)
 {
     int points = stoi(pts_as_string);
 
-    // checks if game is in the data structure yet, adds game if not
+    // checks if game is in the data structure yet, adds if not
     if (gamestatistics.find(game) == gamestatistics.end() )
     {
         gamestatistics.insert( {game, {}} );
@@ -99,6 +99,7 @@ void save_game_stats(GAMES& gamestatistics, std::string& game,
 }
 
 // Opens the file, saves the data to data structure if possible.
+// Returns true if succeeds.
 bool open_file(GAMES& gamestatistics)
 {
     std::string filename = "";
@@ -156,7 +157,8 @@ bool ask_for_input(std::vector<std::string>& command_and_parametres)
     std::string command = command_and_parametres.at(0);
 
     convert_to_upper(command);
-    // if incorrect command is given, notify
+
+    // if incorrect command is given, notify user
     if (COMMANDS.find(command) == COMMANDS.end())
     {
         std::cout << INVALID_INPUT_ERROR_MSG << std::endl;
@@ -164,7 +166,7 @@ bool ask_for_input(std::vector<std::string>& command_and_parametres)
     return command != "QUIT";
 }
 
-// Prints all games in the statistics in alphabetical order
+// Prints all games in the statistics in alphabetical order.
 void print_all_games(GAMES& gamestatistics)
 {
     GAMES::iterator iter;
@@ -200,6 +202,7 @@ std::map<int, std::vector<std::string>> save_scores_per_game
     return sort_by_score;
 }
 
+// Prints the score situation from the given game.
 void print_scores_per_game(GAMES& gamestatistics, std::string gamename)
 {
     std::map<int, std::vector<std::string>> sort_by_score =
@@ -235,7 +238,7 @@ void print_scores_per_game(GAMES& gamestatistics, std::string gamename)
         }
 }
 
-// Checks if the game given is in the data structure.
+// Checks if the given game is in the data structure.
 bool search_game(GAMES& gamestatistics, std::string gamename)
 {
     if (gamestatistics.find(gamename) == gamestatistics.end())
@@ -246,7 +249,7 @@ bool search_game(GAMES& gamestatistics, std::string gamename)
     return true;
 }
 
-// Stores the names all all players in the data structure.
+// Stores the names of all current players in the data structure.
 std::set<std::string> save_names_of_all_players(GAMES& gamestatistics)
 {
     // save names of players in set, so there is no duplicates
@@ -263,7 +266,7 @@ std::set<std::string> save_names_of_all_players(GAMES& gamestatistics)
     return players;
 }
 
-
+// Prints all current players in alphabetical order.
 void print_all_players(GAMES& gamestatistics)
 {
     std::set<std::string> players = save_names_of_all_players(gamestatistics);
@@ -277,7 +280,7 @@ void print_all_players(GAMES& gamestatistics)
     }
 }
 
-// Checks if player is in the data structure (i.e. plays any of the games)
+// Checks if player is in the data structure (i.e. plays any of the games).
 bool search_player(GAMES& gamestatistics, std::string name)
 {
     std::set<std::string> players = save_names_of_all_players(gamestatistics);
@@ -289,8 +292,9 @@ bool search_player(GAMES& gamestatistics, std::string name)
     return true;
 }
 
-// Prints the games the given player plays ( PLAYER-command )
-void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
+// Saves in a set all the games the given player plays.
+std::set<std::string> save_player_stats(GAMES& gamestatistics,
+                                        std::string& name_of_player)
 {
     // go through all of the statistics, if player is found
     // add the name of the game to games_played set
@@ -306,8 +310,15 @@ void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
             }
         }
     }
+    return games_played;
+}
 
-    // prints the games in alphabetic order
+// Prints the games the given player plays in alphabetical order.
+void print_player_stats(GAMES& gamestatistics, std::string& name_of_player)
+{
+    std::set<std::string> games_played =
+            save_player_stats(gamestatistics, name_of_player);
+
     std::cout << "Player " << name_of_player <<
                  " playes the following games:" << std::endl;
     for (const std::string& game : games_played)
@@ -325,7 +336,7 @@ void add_game(GAMES& gamestatistics, std::string& gamename)
         std::cout << "Game was added." << std::endl;
     }
 
-    // if the game is already in the database, notify
+    // if the game is already in the database, notify user
     else
     {
         std::cout << ALREADY_EXISTS_ERROR_MSG << std::endl;
