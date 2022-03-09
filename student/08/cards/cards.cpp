@@ -1,8 +1,6 @@
 #include "cards.hh"
 #include <iostream>
 
-// TODO: Implement the methods here
-
 Cards::Cards(): top_(nullptr)
 {}
 
@@ -18,7 +16,6 @@ void Cards::add(int id)
     new_card->data = id;
     new_card->next = top_;
     top_ = new_card;
-
 }
 
 void Cards::print_from_top_to_bottom(std::ostream &s)
@@ -35,11 +32,29 @@ void Cards::print_from_top_to_bottom(std::ostream &s)
     }
 }
 
-/*bool Cards::remove(int &id)
+bool Cards::remove(int &id)
 {
+    if (top_ == nullptr)
+    {
+        return false;
+    }
 
+    Card_data *topmost = top_;
+    id = topmost->data;
+
+    if (topmost->next == nullptr)
+    {
+        top_ = nullptr;
+    }
+    else
+    {
+        top_ = topmost->next;
+    }
+    delete topmost;
+    return true;
 }
 
+/*
 bool Cards::bottom_to_top()
 {
 
