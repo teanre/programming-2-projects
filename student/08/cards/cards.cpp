@@ -26,7 +26,7 @@ void Cards::print_from_top_to_bottom(std::ostream &s)
 
     while(current)
     {
-        s << i << " : " << current->data << std::endl;
+        s << i << ": " << current->data << std::endl;
         current = current->next;
         ++i;
     }
@@ -130,7 +130,7 @@ int Cards::recursive_print(Card_data *top, std::ostream &s)
         i += recursive_print(top->next, s);
     }
 
-    s << i << " : " << top->data << std::endl;
+    s << i << ": " << top->data << std::endl;
 
     return i;
 }
