@@ -18,7 +18,7 @@ void Queue::enqueue(const string &reg)
     // jos vihreät valot, ei jää jonoon - ei luoda structia
     if (is_green_ == true)
     {
-        std::cout << "GREEN: the vehicle " << reg << " need not stop to wait" << std::endl;
+        std::cout << "GREEN: The vehicle " << reg << " need not stop to wait" << std::endl;
     }
     // muuten luo vehiclen
     else
@@ -61,8 +61,7 @@ void Queue::switch_light()
     }
     else
     {
-        // muuten dequeutetaan ja apumuuttujan avulla katotaan kuinka monta mennyt
-        // jos nexti on nullptr ei mennä eteenp
+        std::cout << "Vehicle(s) ";
         uint how_many_have_passed = 1;
         while (how_many_have_passed <= cycle_)
         {
