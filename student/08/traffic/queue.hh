@@ -53,6 +53,7 @@ private:
     unsigned int cycle_;
 
     // You can define more private features here
+    void dequeue();
 
 };
 
