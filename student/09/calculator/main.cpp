@@ -126,28 +126,32 @@ int main() {
             {
                 if (amount_of_parametres == s.parameter_number)
                 {
-                    string par1 = pieces.at(1);
-                    string par2 = pieces.at(2);
-                    double result1 = 0.0;
-                    double result2 = 0.0;
-                    if (string_to_double(par1, result1) && string_to_double(par2, result2))
+                    if (s.is_exit)
                     {
-                        cout << (s.action)(result1, result2) << endl;
+                       cout << GREETING_AT_END << endl;
+                       return EXIT_SUCCESS;
                     }
                     else
                     {
-                        cout << OPERAND_ERROR_MSG << endl;
+                        string par1 = pieces.at(1);
+                        string par2 = pieces.at(2);
+                        double result1 = 0.0;
+                        double result2 = 0.0;
+                        if (string_to_double(par1, result1) && string_to_double(par2, result2))
+                        {
+                            cout << (s.action)(result1, result2) << endl;
+                        }
+                        else
+                        {
+                            cout << OPERAND_ERROR_MSG << endl;
+                        }
+                        }
                     }
-                }
                 else
                 {
                     cout << PARAMETER_ERROR_MSG << endl;
                 }
-            }}
-
-            if (s.is_exit)
-            {
-               EXIT_SUCCESS;
+            }
             }
         }
     }
