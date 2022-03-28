@@ -7,5 +7,5 @@ Mammal::Mammal(): Animal("Kip kop kip kop")
 
 void Mammal::suckle(std::ostream &output)
 {
-    output << "Mus Mus" << std::endl;
+    output << "Mus mus" << std::endl;
 }
