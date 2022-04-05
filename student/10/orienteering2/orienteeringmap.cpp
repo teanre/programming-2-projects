@@ -111,18 +111,11 @@ void OrienteeringMap::print_points() const
 
 void OrienteeringMap::print_route(const std::string &name) const
 {
-    std::map<std::string, std::vector <std::shared_ptr<Point>> >::iterator iter;
-    iter = all_routes_.begin();
-    while ( iter != all_routes_.end() )
-    {
-         std::cout <<    << iter->second << std::endl;
-          ++iter;
-    }
+    std::cout << all_routes_.at(name).at(0)->get_name() << std::endl;
 
-
-    for (const auto& r : all_routes_.at(name))
+    for (uint i = 1; i < all_routes_.at(name).size(); ++i)
     {
-        std::cout << " -> " << r->get_name() << std::endl;
+        std::cout << " -> " << all_routes_.at(name).at(i)->get_name() << std::endl;
     }
 }
 
