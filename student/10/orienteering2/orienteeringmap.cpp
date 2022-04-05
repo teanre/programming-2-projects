@@ -114,7 +114,7 @@ void OrienteeringMap::print_map() const
     std::cout << "  ";
     for(int x = 0; x < width_; ++x)
     {
-        if (x < 10)
+        if (x < 9)
         {
             std::cout << " " << x+1 << " ";
         }

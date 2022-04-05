@@ -1,9 +1,8 @@
-/*Orienteerin map
+/*Orienteering map
  *
  * Desc:
- *  This program blabla
- *
- *
+ *  This program simulates an orienteering map. It stores data of different
+ *  orienteering routes and detailed information of the points on the route.
  *
  *
  *
