@@ -13,8 +13,14 @@
 
 #ifndef ORIENTEERINGMAP_HH
 #define ORIENTEERINGMAP_HH
+#include "point.hh"
 
 #include <string>
+#include <map>
+#include <vector>
+#include <memory>
+
+class Point;
 
 class OrienteeringMap
 {
@@ -67,6 +73,16 @@ private:
     // At least you need a datastructure for points or routes or for both,
     // containing Point* or Route* objects (pointers).
     // Good candidates for such structures are STL maps or vectors.
+    int height_ = 0;
+    int width_ = 0;
+
+
+    //info of points strored here: key name of point, lksdl pointer to point
+    std::map<std::string, std::shared_ptr<Point>> all_points_;
+    // data of all routes is stored here: key the name of route, the points on
+    // the route stored a a vector
+    std::map<std::string, std::vector <std::shared_ptr<Point>> > all_routes_;
+
 };
 
 #endif // ORIENTEERINGMAP_HH
