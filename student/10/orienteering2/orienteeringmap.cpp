@@ -196,10 +196,14 @@ void OrienteeringMap::print_route(const std::string &name) const
 
 void OrienteeringMap::route_length(const std::string &name) const
 {
-
+    //not implementing this
+    std::string length;
+    length = name;
 }
 
 void OrienteeringMap::greatest_rise(const std::string &point_name) const
 {
-
+    //not implementing this
+    std::string greatest;
+    greatest = point_name;
 }
