@@ -87,8 +87,8 @@ bool OrienteeringMap::connect_route(std::string from,
 
 void OrienteeringMap::print_map() const
 {
-
-   std::vector<std::vector<std::shared_ptr <Point>>> board;
+    // create a board structure for organizing and printing the map
+    std::vector<std::vector<std::shared_ptr <Point>>> board;
 
     for(int y = 0; y < height_; ++y)
     {
