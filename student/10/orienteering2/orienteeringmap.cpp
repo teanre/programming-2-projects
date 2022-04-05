@@ -93,17 +93,15 @@ void OrienteeringMap::print_map() const
 
 void OrienteeringMap::print_routes() const
 {
-    //pakollinen
     std::cout << "Routes:" << std::endl;
-    for (const auto& p : all_routes_)
+    for (const auto& r : all_routes_)
     {
-        std::cout << " - " << p.first << std::endl;
+        std::cout << " - " << r.first << std::endl;
     }
 }
 
 void OrienteeringMap::print_points() const
 {
-    //pakollinen
     std::cout << "Points: " << std::endl;
     for (const auto& pts : all_points_)
     {
@@ -113,7 +111,15 @@ void OrienteeringMap::print_points() const
 
 void OrienteeringMap::print_route(const std::string &name) const
 {
-    //pakollinen
+    std::map<std::string, std::vector <std::shared_ptr<Point>> >::iterator iter;
+    iter = all_routes_.begin();
+    while ( iter != all_routes_.end() )
+    {
+         std::cout <<    << iter->second << std::endl;
+          ++iter;
+    }
+
+
     for (const auto& r : all_routes_.at(name))
     {
         std::cout << " -> " << r->get_name() << std::endl;
