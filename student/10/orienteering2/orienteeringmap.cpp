@@ -17,7 +17,6 @@ OrienteeringMap::~OrienteeringMap()
 
 void OrienteeringMap::set_map_size(int width, int height)
 {
-    //muuttaa ko. attribuuttien arvot
     width_ = width;
     height_ = height;
 }
@@ -28,78 +27,56 @@ void OrienteeringMap::add_point(std::string name,
                                 int height,
                                 char marker)
 {
-    //jos koordinaatit osuvat kartalle, voidaan lisätä rasti kartalle
-    if (x >=0 && x <= width_ && y >= 0 && y <= height_)
+    // adds new point, if point's coordinates are valid (fit the on the board)
+    // and the point doesn't already exist
+    if (x >=0 && x <= width_ && y >= 0 && y <= height_
+            && all_points_.find(name) == all_points_.end())
     {
-        //jos rastia ei ole vielä listalla
-        if (all_points_.find(name) == all_points_.end())
-        {
-           std::shared_ptr<Point> new_point( std::make_shared<Point>(name, x, y, height, marker, this));
-           all_points_.insert({name, new_point});
-        }
-     }
-        //ja onko oliota jo olemassa eli onko pointnameslistalla
-
-        //lisätään allpointsiin
-
-   /* std::cout << all_points_.size() << std::endl;
-
-    std::map<std::string, std::shared_ptr<Point>>::iterator iter;
-    iter = all_points_.begin();
-    while (iter != all_points_.end())
-    {
-        std::cout << iter->first << std::endl;
-        ++iter;
-    }*/
-
+        std::shared_ptr<Point> new_point
+                ( std::make_shared<Point>(name, x, y, height, marker, this));
+        all_points_.insert({name, new_point});
+    }
 }
-
-/*void OrienteeringMap::get_route(std::map<std::string, std::vector<Point *> > route_name)
-{
-
-}*/
 
 bool OrienteeringMap::connect_route(std::string from,
                                     std::string to,
                                     std::string route_name)
 {
-    //tehdään temppipointterit
-    std::shared_ptr<Point> tempfrom = nullptr;
-    std::shared_ptr<Point> tempto = nullptr;
 
-    //ensin tarkistetaan onko rastit olemassa. mikäli ei, palauttaa false.
+    std::shared_ptr<Point> fromptr = nullptr;
+    std::shared_ptr<Point> toptr = nullptr;
+
+    //check if the given points exist. if not, returns false.
     if (all_points_.find(from) != all_points_.end())
     {
-        tempfrom = all_points_.at(from);
+        fromptr = all_points_.at(from);
     }
     if (all_points_.find(to) != all_points_.end())
     {
-        tempto = all_points_.at(to);
+        toptr = all_points_.at(to);
     }
     else
     {
         return false;
     }
 
-    std::vector<std::shared_ptr<Point>> tempvec;
+    std::vector<std::shared_ptr<Point>> vec;
 
-    // jos reittiä ei ole vielä tallennettuna, ensin alustetaan reitti
-    // ja sitten lisätään rastit vektoriin
+    // if the route doesn't exist yet, add to route datastructure
     if (all_routes_.find(route_name) == all_routes_.end())
     {
-        all_routes_.insert({route_name, tempvec});
-        all_routes_.at(route_name).push_back(tempfrom);
-        all_routes_.at(route_name).push_back(tempto);
-        //std::cout << "koko on:" << all_routes_.at(route_name) << std::endl;
+        all_routes_.insert({route_name, vec});
+        all_routes_.at(route_name).push_back(fromptr);
+        all_routes_.at(route_name).push_back(toptr);
     }
-    //muuten pitäisi olla niin että vain to päivitetään oikeaan paikkaan
+    // otherwise connect the routes
     else
     {
       for (uint i = 0; i <= all_routes_.at(route_name).size(); ++i)
       {
           if (all_routes_.at(route_name).at(i)->get_name() == from)
           {
-              all_routes_.at(route_name).push_back(tempto);
+              all_routes_.at(route_name).push_back(toptr);
               break;
           }
       }
@@ -127,12 +104,13 @@ void OrienteeringMap::print_routes() const
 void OrienteeringMap::print_points() const
 {
     //pakollinen
+    std::cout << "Points: " << std::endl;
+    //for
 }
 
 void OrienteeringMap::print_route(const std::string &name) const
 {
     //pakollinen
-    std::cout << name << std::endl;
     for (const auto& r : all_routes_.at(name))
     {
         std::cout << " -> " << r->get_name() << std::endl;

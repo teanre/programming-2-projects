@@ -24,6 +24,7 @@ public:
     //void add(std::string name, int x, int y, int height, char id, OrienteeringMap *map);
 
     std::string get_name();
+    char get_id();
 
 private:
     std::string name_;

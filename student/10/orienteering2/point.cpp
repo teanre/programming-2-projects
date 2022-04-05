@@ -32,3 +32,8 @@ std::string Point::get_name()
 {
     return name_;
 }
+
+char Point::get_id()
+{
+    return id_;
+}
