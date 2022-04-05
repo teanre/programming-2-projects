@@ -23,6 +23,7 @@ public:
     // returns the id of the route
     char get_id();
 
+    // return the coordinates of the route
     int get_x();
     int get_y();
 

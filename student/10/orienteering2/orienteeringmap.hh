@@ -76,14 +76,12 @@ private:
     int height_ = 0;
     int width_ = 0;
 
-
-    //info of points strored here: key name of point, lksdl pointer to point
-    std::vector< std::vector< std::shared_ptr<Point> > > board_;
+    //info of points strored here: key name of point, value pointer to the point
     std::map<std::string, std::shared_ptr<Point>> all_points_;
-    // data of all routes is stored here: key the name of route, the points on
-    // the route stored a a vector
-    std::map<std::string, std::vector <std::shared_ptr<Point>> > all_routes_;
 
+    // data of all routes is stored here: key the name of route, the points on
+    // the route stored in a vector
+    std::map<std::string, std::vector <std::shared_ptr<Point>> > all_routes_;
 };
 
 #endif // ORIENTEERINGMAP_HH

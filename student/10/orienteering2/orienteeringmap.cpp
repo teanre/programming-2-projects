@@ -87,8 +87,7 @@ bool OrienteeringMap::connect_route(std::string from,
 
 void OrienteeringMap::print_map() const
 {
-    //for loopilla widht ja heigfth attribuuttia hyödyntäen tulostaa koordinaatit
-    // piste jos tyhjä, muuten sisältämä pointin id_
+
    std::vector<std::vector<std::shared_ptr <Point>>> board;
 
     for(int y = 0; y < height_; ++y)
@@ -112,7 +111,7 @@ void OrienteeringMap::print_map() const
         board.at(y_coord-1).at(x_coord-1) = pts.second;
     }
 
-    std::cout << "   ";
+    std::cout << "  ";
     for(int x = 0; x < width_; ++x)
     {
         if (x < 10)
@@ -141,15 +140,9 @@ void OrienteeringMap::print_map() const
         {
             if(board.at(y).at(x) != nullptr)
             {
-                if (y < 10)
-                {
-                    std::cout << " " << board.at(y).at(x)->get_id() << " ";
-                }
-                else
-                {
-                    std::cout << board.at(y).at(x)->get_id();
-                }
-            } else
+                std::cout << " " << board.at(y).at(x)->get_id() << " ";
+            }
+            else
             {
                 std::cout << " . " ;
             }
