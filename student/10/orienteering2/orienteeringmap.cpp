@@ -43,17 +43,17 @@ bool OrienteeringMap::connect_route(std::string from,
                                     std::string route_name)
 {
 
-    std::shared_ptr<Point> fromptr = nullptr;
-    std::shared_ptr<Point> toptr = nullptr;
+    std::shared_ptr<Point> from_ptr = nullptr;
+    std::shared_ptr<Point> to_ptr = nullptr;
 
     //check if the given points exist. if not, returns false.
     if (all_points_.find(from) != all_points_.end())
     {
-        fromptr = all_points_.at(from);
+        from_ptr = all_points_.at(from);
     }
     if (all_points_.find(to) != all_points_.end())
     {
-        toptr = all_points_.at(to);
+        to_ptr = all_points_.at(to);
     }
     else
     {
@@ -66,8 +66,8 @@ bool OrienteeringMap::connect_route(std::string from,
     if (all_routes_.find(route_name) == all_routes_.end())
     {
         all_routes_.insert({route_name, vec});
-        all_routes_.at(route_name).push_back(fromptr);
-        all_routes_.at(route_name).push_back(toptr);
+        all_routes_.at(route_name).push_back(from_ptr);
+        all_routes_.at(route_name).push_back(to_ptr);
     }
     // otherwise connect the routes
     else
@@ -76,7 +76,7 @@ bool OrienteeringMap::connect_route(std::string from,
       {
           if (all_routes_.at(route_name).at(i)->get_name() == from)
           {
-              all_routes_.at(route_name).push_back(toptr);
+              all_routes_.at(route_name).push_back(to_ptr);
               break;
           }
       }
@@ -105,7 +105,10 @@ void OrienteeringMap::print_points() const
 {
     //pakollinen
     std::cout << "Points: " << std::endl;
-    //for
+    for (const auto& pts : all_points_)
+    {
+        std::cout << " - " << pts.first << " : " << pts.second->get_id() << std::endl;
+    }
 }
 
 void OrienteeringMap::print_route(const std::string &name) const
