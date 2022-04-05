@@ -38,6 +38,7 @@ void OrienteeringMap::add_point(std::string name,
     }
 }
 
+
 bool OrienteeringMap::connect_route(std::string from,
                                     std::string to,
                                     std::string route_name)
@@ -86,9 +87,75 @@ bool OrienteeringMap::connect_route(std::string from,
 
 void OrienteeringMap::print_map() const
 {
-    //pakollinen
     //for loopilla widht ja heigfth attribuuttia hyödyntäen tulostaa koordinaatit
     // piste jos tyhjä, muuten sisältämä pointin id_
+   std::vector<std::vector<std::shared_ptr <Point>>> board;
+
+    for(int y = 0; y < height_; ++y)
+    {
+        std::vector< std::shared_ptr<Point> > line;
+        for(int x = 0; x < width_; ++x)
+        {
+            std::shared_ptr< Point > newPoint = nullptr;
+            line.push_back(newPoint);
+        }
+        board.push_back(line);
+    }
+
+    int x_coord = 0;
+    int y_coord = 0;
+
+    for (const auto& pts : all_points_)
+    {
+        x_coord = pts.second->get_x();
+        y_coord = pts.second->get_y();
+        board.at(y_coord-1).at(x_coord-1) = pts.second;
+    }
+
+    std::cout << "   ";
+    for(int x = 0; x < width_; ++x)
+    {
+        if (x < 10)
+        {
+            std::cout << " " << x+1 << " ";
+        }
+        else
+        {
+            std::cout << x+1 << " ";
+        }
+    }
+    std::cout << std::endl;
+
+
+    for(int y = 0; y < height_; ++y)
+    {
+        if (y < 9)
+        {
+            std::cout << " " << (y+1) << " ";
+        }
+        else
+        {
+            std::cout << y+1 << " ";
+        }
+        for(int x = 0; x < width_; ++x)
+        {
+            if(board.at(y).at(x) != nullptr)
+            {
+                if (y < 10)
+                {
+                    std::cout << " " << board.at(y).at(x)->get_id() << " ";
+                }
+                else
+                {
+                    std::cout << board.at(y).at(x)->get_id();
+                }
+            } else
+            {
+                std::cout << " . " ;
+            }
+        }
+        std::cout << std::endl;
+    }
 }
 
 void OrienteeringMap::print_routes() const
@@ -111,11 +178,19 @@ void OrienteeringMap::print_points() const
 
 void OrienteeringMap::print_route(const std::string &name) const
 {
-    std::cout << all_routes_.at(name).at(0)->get_name() << std::endl;
-
-    for (uint i = 1; i < all_routes_.at(name).size(); ++i)
+    if (all_routes_.find(name) == all_routes_.end())
     {
-        std::cout << " -> " << all_routes_.at(name).at(i)->get_name() << std::endl;
+        std::cout << "Error: Route named " << name << " can't be found" << std::endl;
+        return;
+    }
+    else
+    {
+        std::cout << all_routes_.at(name).at(0)->get_name() << std::endl;
+
+        for (uint i = 1; i < all_routes_.at(name).size(); ++i)
+        {
+            std::cout << " -> " << all_routes_.at(name).at(i)->get_name() << std::endl;
+        }
     }
 }
 

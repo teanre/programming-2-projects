@@ -78,6 +78,7 @@ private:
 
 
     //info of points strored here: key name of point, lksdl pointer to point
+    std::vector< std::vector< std::shared_ptr<Point> > > board_;
     std::map<std::string, std::shared_ptr<Point>> all_points_;
     // data of all routes is stored here: key the name of route, the points on
     // the route stored a a vector

@@ -23,6 +23,9 @@ public:
     // returns the id of the route
     char get_id();
 
+    int get_x();
+    int get_y();
+
 private:
     // name of the route, location of the route with x and y coordinates,
     // height of the route and id of the route
