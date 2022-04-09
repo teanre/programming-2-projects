@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QIntValidator* ival = new QIntValidator(1, 999, this);
+    QIntValidator* ival = new QIntValidator(this);
     ui->heightLineEdit->setValidator(ival);
     ui->weightLineEdit->setValidator(ival);
 }
@@ -33,11 +33,19 @@ void MainWindow::on_heightLineEdit_editingFinished()
 
 void MainWindow::on_countButton_clicked()
 {
-    calculateBMI(weigth_, heigth_);
+    if (heigth_.isEmpty() || heigth_ == "0")
+    {
+        ui->resultLabel->setText("Cannot count");
+    }
+    else
+    {
+        calculateBMI(weigth_, heigth_);
+    }
 }
 
 void MainWindow::calculateBMI(QString weight, QString height)
 {
+
     float bmi = weight.toFloat() / ( (height.toFloat()/100) * (height.toFloat()/100) );
     QString bmiAsString = QString::number(bmi);
 
