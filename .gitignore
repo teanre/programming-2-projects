@@ -2,3 +2,5 @@
 build*/
 templates/*
 examples/*
+Makefile
+.qmake.stash
