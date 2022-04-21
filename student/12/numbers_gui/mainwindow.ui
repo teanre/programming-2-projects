@@ -20,12 +20,12 @@
       <x>530</x>
       <y>40</y>
       <width>241</width>
-      <height>241</height>
+      <height>276</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="4" column="1">
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="startButton">
        <property name="text">
         <string>Start</string>
        </property>
@@ -38,14 +38,8 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="seedNumberBox"/>
-     </item>
-     <item row="3" column="1">
-      <widget class="QSpinBox" name="goalNumberBox"/>
-     </item>
      <item row="5" column="1">
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="resetButton">
        <property name="text">
         <string>Reset</string>
        </property>
@@ -64,6 +58,12 @@
         <string>Close</string>
        </property>
       </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="seedLine"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="goalLine"/>
      </item>
     </layout>
    </widget>
@@ -91,5 +91,22 @@
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>711</x>
+     <y>277</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

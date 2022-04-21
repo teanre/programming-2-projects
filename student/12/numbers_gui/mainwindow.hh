@@ -17,22 +17,31 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(GameBoard& board, QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
 
-    void on_seedNumberBox_valueChanged(int arg1);
+    //void on_seedNumberBox_valueChanged(int arg1);
+
+    void on_startButton_clicked();
+
+    void on_seedLine_textChanged(const QString &arg1);
+
+    void on_goalLine_textChanged(const QString &arg1);
 
 private:
     Ui::MainWindow *ui_;
 
     QGraphicsScene* scene_;
     QGraphicsRectItem* rect_;
-    GameBoard graboard_;
-    std::vector< std::vector< std::shared_ptr<NumberTile> > > board_;
+    GameBoard& graboard_;
+    //std::vector< std::vector< std::shared_ptr<NumberTile> > > board_;
     std::vector<std::vector<QLabel*>> labels_;
-    QList<QPushButton*> board;
+
+    int seed_;
+    int goal_;
+
     const int STEP = 100;
     const int BORDER_UP = 0;
     const int BORDER_DOWN = 260;
@@ -40,6 +49,8 @@ private:
     const int BORDER_RIGHT = 680;
 
     void createGraphicalBoard();
+
+    void fillGraphicalBoard();
 
     //void createButtonBoard();
 
