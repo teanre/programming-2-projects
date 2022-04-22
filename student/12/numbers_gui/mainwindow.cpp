@@ -7,6 +7,12 @@
 #include <QGridLayout>
 #include <iostream>
 
+const Coords DEFAULT_DIR = {0, 0};
+const Coords LEFT = {0, -1};
+const Coords UP = {-1, 0};
+const Coords RIGHT = {0, 1};
+const Coords DOWN = {1, 0};
+
 MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow)
@@ -21,8 +27,8 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
 
     scene_ = new QGraphicsScene(this);
 
-    int left_margin = 10; // x coordinate
-    int top_margin = 10; // y coordinate
+    int left_margin = 20; // x coordinate
+    int top_margin = 20; // y coordinate
 
     ui_->graphicsView->setGeometry(left_margin, top_margin,
                                        SIZE*STEP + 2, SIZE*STEP + 2);
@@ -39,6 +45,49 @@ MainWindow::~MainWindow()
     delete ui_;
 }
 
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+
+    Coords dir = DEFAULT_DIR;
+    // moving to left
+    if(event->key() == Qt::Key_A)
+    {
+        dir = LEFT;
+    }
+    if (event->key() == Qt::Key_W)
+    {
+        dir = UP;
+    }
+    if (event->key() == Qt::Key_D)
+    {
+        dir = RIGHT;
+    }
+    if (event->key() == Qt::Key_S)
+    {
+        dir = DOWN;
+    }
+
+    if (dir != DEFAULT_DIR)
+    {
+        if (graboard_.move(dir, goal_))
+        {
+            QString text = "You reached the goal value of ";
+            QString goalqs = QString::number(goal_);
+            text += goalqs;
+            text += "!";
+            ui_->textBrowser->setText(text);
+        }
+        else if (graboard_.is_full())
+        {
+            QString text = "Can't add new tile, you lost!";
+            ui_->textBrowser->setText(text);
+        }
+        graboard_.new_value(false);
+    }
+    updateGraphicalBoard();
+}
+
+
 void MainWindow::createGraphicalBoard()
 {
 
@@ -47,9 +96,7 @@ void MainWindow::createGraphicalBoard()
     blackPen.setWidth(2);
 
     std::vector<QGraphicsRectItem*> rects;
-    //to change text content, can be reached by coordinates?
     std::vector<QLabel*> helper;
-
 
     for (int row = 0; row < SIZE; ++row)
     {
@@ -80,11 +127,9 @@ void MainWindow::createGraphicalBoard()
         labels_.push_back(helper);
         helper.clear();
     }
-
-    labels_.at(0).at(1)->setText("HAHA");
 }
 
-void MainWindow::fillGraphicalBoard()
+void MainWindow::updateGraphicalBoard()
 {
     for (int i = 0; i < SIZE; ++i)
     {
@@ -105,7 +150,7 @@ void MainWindow::on_startButton_clicked()
     graboard_.init_empty();
     //kaivaa seedin
     graboard_.fill(seed_);
-    fillGraphicalBoard();
+    updateGraphicalBoard();
 }
 
 
@@ -118,5 +163,6 @@ void MainWindow::on_seedLine_textChanged(const QString &arg1)
 void MainWindow::on_goalLine_textChanged(const QString &arg1)
 {
     goal_ = arg1.toInt();
+    std::cout << "goali on" << goal_ << std::endl;
 }
 

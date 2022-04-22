@@ -20,9 +20,9 @@ public:
     MainWindow(GameBoard& board, QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
+    void keyPressEvent(QKeyEvent* event) override;
 
-    //void on_seedNumberBox_valueChanged(int arg1);
+private slots:
 
     void on_startButton_clicked();
 
@@ -36,7 +36,7 @@ private:
     QGraphicsScene* scene_;
     QGraphicsRectItem* rect_;
     GameBoard& graboard_;
-    //std::vector< std::vector< std::shared_ptr<NumberTile> > > board_;
+
     std::vector<std::vector<QLabel*>> labels_;
 
     int seed_;
@@ -50,9 +50,7 @@ private:
 
     void createGraphicalBoard();
 
-    void fillGraphicalBoard();
-
-    //void createButtonBoard();
+    void updateGraphicalBoard();
 
 };
 #endif // MAINWINDOW_HH
