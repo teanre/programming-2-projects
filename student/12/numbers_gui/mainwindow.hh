@@ -30,11 +30,12 @@ private slots:
 
     void on_goalLine_textChanged(const QString &arg1);
 
+    void on_resetButton_clicked();
+
 private:
     Ui::MainWindow *ui_;
 
     QGraphicsScene* scene_;
-    QGraphicsRectItem* rect_;
     GameBoard& graboard_;
 
     std::vector<std::vector<QLabel*>> labels_;
@@ -51,6 +52,10 @@ private:
     void createGraphicalBoard();
 
     void updateGraphicalBoard();
+
+    void disableLabels();
+
+    void enableLabels();
 
 };
 #endif // MAINWINDOW_HH

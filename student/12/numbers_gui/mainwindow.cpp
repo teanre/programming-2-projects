@@ -17,7 +17,6 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow)
     , scene_()
-    , rect_()
     , graboard_(board)
     , labels_()
     , seed_(0)
@@ -37,7 +36,6 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     scene_->setSceneRect(0, 0, SIZE*STEP - 1, SIZE*STEP - 1);
 
     createGraphicalBoard();
-
 }
 
 MainWindow::~MainWindow()
@@ -47,7 +45,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-
     Coords dir = DEFAULT_DIR;
     // moving to left
     if(event->key() == Qt::Key_A)
@@ -76,11 +73,13 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             text += goalqs;
             text += "!";
             ui_->textBrowser->setText(text);
+            disableLabels();
         }
         else if (graboard_.is_full())
         {
             QString text = "Can't add new tile, you lost!";
             ui_->textBrowser->setText(text);
+            disableLabels();
         }
         graboard_.new_value(false);
     }
@@ -145,8 +144,31 @@ void MainWindow::updateGraphicalBoard()
     }
 }
 
+void MainWindow::disableLabels()
+{
+    for (auto vec : labels_)
+    {
+        for (auto labeli : vec)
+        {
+            labeli->setEnabled(false);
+        }
+    }
+}
+
+void MainWindow::enableLabels()
+{
+    for (auto vec : labels_)
+    {
+        for (auto labeli : vec)
+        {
+            labeli->setEnabled(true);
+        }
+    }
+}
+
 void MainWindow::on_startButton_clicked()
 {
+    enableLabels();
     graboard_.init_empty();
     //kaivaa seedin
     graboard_.fill(seed_);
@@ -163,6 +185,13 @@ void MainWindow::on_seedLine_textChanged(const QString &arg1)
 void MainWindow::on_goalLine_textChanged(const QString &arg1)
 {
     goal_ = arg1.toInt();
-    std::cout << "goali on" << goal_ << std::endl;
+}
+
+
+void MainWindow::on_resetButton_clicked()
+{
+    enableLabels();
+    graboard_.reset(seed_);
+    updateGraphicalBoard();
 }
 

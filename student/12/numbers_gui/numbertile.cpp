@@ -77,6 +77,11 @@ int NumberTile::get_value()
     return value_;
 }
 
+void NumberTile::reset_value()
+{
+    value_ = 0;
+}
+
 bool NumberTile::is_on_board(Coords coords)
 {
     return coords.first >= 0 and coords.first < SIZE and

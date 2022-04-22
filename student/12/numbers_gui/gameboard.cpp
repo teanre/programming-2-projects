@@ -52,6 +52,22 @@ void GameBoard::fill(int seed)
     }
 }
 
+void GameBoard::reset(int seed)
+{
+    for( auto y = 0; y < SIZE; ++y )
+    {
+        for( auto x = 0; x < SIZE; ++x )
+        {
+            board_.at(y).at(x)->reset_value();
+        }
+    }
+
+    for( int i = 0 ; i < SIZE ; ++i )
+    {
+        new_value();
+    }
+}
+
 void GameBoard::new_value(bool check_if_empty)
 {
     if( check_if_empty and is_full() ){

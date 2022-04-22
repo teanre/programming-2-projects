@@ -37,6 +37,8 @@ public:
 
     int get_value();
 
+    void reset_value();
+
 private:
     // Value in the number tile
     int value_;
