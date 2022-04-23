@@ -19,6 +19,11 @@ public:
     // Destructor
     ~GameBoard();
 
+    // Returns the size attribute
+    int get_size();
+
+    void set_size(int size);
+
     // Initializes the gameboard with nullptrs.
     void init_empty();
 
@@ -51,6 +56,9 @@ public:
 private:
     // Internal structure of the game board
     std::vector<std::vector<NumberTile*>> board_;
+
+    // Size of the gameboard so it can be adjusted
+    int size_;
 
     // Random number generator and distribution,
     // they work better, if they are attributes of a class.

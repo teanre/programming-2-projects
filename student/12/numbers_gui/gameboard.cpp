@@ -1,7 +1,7 @@
 #include "gameboard.hh"
 #include <iostream>
 
-GameBoard::GameBoard()
+GameBoard::GameBoard(): size_(4)
 {
 }
 
@@ -17,14 +17,24 @@ GameBoard::~GameBoard()
     }
 }
 
+int GameBoard::get_size()
+{
+    return size_;
+}
+
+void GameBoard::set_size(int size)
+{
+    size_ = size;
+}
+
 void GameBoard::init_empty()
 {
     std::vector<NumberTile*> row;
-    for( int i = 0; i < SIZE; ++i)
+    for( int i = 0; i < size_; ++i)
     {
         row.push_back(nullptr);
     }
-    for( int i = 0; i < SIZE; ++i)
+    for( int i = 0; i < size_; ++i)
     {
         board_.push_back(row);
     }
@@ -33,20 +43,20 @@ void GameBoard::init_empty()
 void GameBoard::fill(int seed)
 {
     randomEng_.seed(seed);
-    distribution_ = std::uniform_int_distribution<int>(0, SIZE - 1);
+    distribution_ = std::uniform_int_distribution<int>(0, size_ - 1);
 
     // Wiping out the first random number (which is almost almost 0)
     distribution_(randomEng_);
 
-    for( auto y = 0; y < SIZE; ++y )
+    for( auto y = 0; y < size_; ++y )
     {
-        for( auto x = 0; x < SIZE; ++x )
+        for( auto x = 0; x < size_; ++x )
         {
             board_.at(y).at(x) = new NumberTile(0, std::make_pair(y, x), this);
         }
     }
 
-    for( int i = 0 ; i < SIZE ; ++i )
+    for( int i = 0 ; i < size_ ; ++i )
     {
         new_value();
     }
@@ -54,15 +64,15 @@ void GameBoard::fill(int seed)
 
 void GameBoard::reset()
 {
-    for( auto y = 0; y < SIZE; ++y )
+    for( auto y = 0; y < size_; ++y )
     {
-        for( auto x = 0; x < SIZE; ++x )
+        for( auto x = 0; x < size_; ++x )
         {
             board_.at(y).at(x)->reset_value();
         }
     }
 
-    for( int i = 0 ; i < SIZE ; ++i )
+    for( int i = 0 ; i < size_ ; ++i )
     {
         new_value();
     }
@@ -87,14 +97,14 @@ void GameBoard::print() const
 {
     for( auto y : board_ )
     {
-        std::cout << std::string(PRINT_WIDTH * SIZE + 1, '-') << std::endl;
+        std::cout << std::string(PRINT_WIDTH * size_ + 1, '-') << std::endl;
         for( auto x : y )
         {
             x->print(PRINT_WIDTH);
         }
         std::cout << "|" << std::endl;
     }
-    std::cout << std::string(PRINT_WIDTH * SIZE + 1, '-') << std::endl;
+    std::cout << std::string(PRINT_WIDTH * size_ + 1, '-') << std::endl;
 }
 
 bool GameBoard::move(Coords dir, int goal)

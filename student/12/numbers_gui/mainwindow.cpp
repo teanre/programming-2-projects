@@ -19,6 +19,7 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     , scene_()
     , graboard_(board)
     , labels_()
+    , boardsize_(4)
     , seed_(0)
     , goal_(2048)
     , amount_of_starts_(0)
@@ -31,10 +32,12 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     int top_margin = 20; // y coordinate
 
     ui_->graphicsView->setGeometry(left_margin, top_margin,
-                                       SIZE*STEP + 2, SIZE*STEP + 2);
+                                       boardsize_*STEP + 2, boardsize_*STEP + 2);
     ui_->graphicsView->setScene(scene_);
 
-    scene_->setSceneRect(0, 0, SIZE*STEP - 1, SIZE*STEP - 1);
+    scene_->setSceneRect(0, 0, boardsize_*STEP - 1, boardsize_*STEP - 1);
+
+    ui_->seedLabel->setStyleSheet("QLabel: {background-color: green}");
 
     createGraphicalBoard();
 }
@@ -74,6 +77,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             text += goalqs;
             text += "!";
             ui_->textBrowser->setText(text);
+            winColors();
             disableLabels();
         }
         else if (graboard_.is_full())
@@ -98,27 +102,27 @@ void MainWindow::createGraphicalBoard()
     std::vector<QGraphicsRectItem*> rects;
     std::vector<QLabel*> helper;
 
-    for (int row = 0; row < SIZE; ++row)
+    for (int row = 0; row < boardsize_; ++row)
     {
-        for (int column = 0; column < SIZE; ++column)
+        for (int column = 0; column < boardsize_; ++column)
         {
             QLabel* label = new QLabel("*", this);
             if (column == 0)
             {
                 scene_->addRect(column, row+(row*STEP), STEP, STEP, blackPen, whiteBrush);
-                label->setGeometry(column, row+(row*STEP), STEP, STEP);
+                label->setGeometry(column, row+(row*STEP), STEP*1.75, STEP*1.75);
                 label->setAlignment(Qt::AlignCenter);
             }
             else if (column >0)
             {
                 scene_->addRect(column+(column*STEP), row+(row*STEP), STEP, STEP, blackPen, whiteBrush);
-                label->setGeometry(column+(column*STEP), row+(row*STEP), STEP, STEP);
+                label->setGeometry(column+(column*STEP), row+(row*STEP), STEP*1.75, STEP*1.75);
                 label->setAlignment(Qt::AlignCenter);
             }
             else
             {
                scene_->addRect(column+(column*STEP), row, STEP, STEP, blackPen, whiteBrush);
-               label->setGeometry(column+(column*STEP), row, STEP, STEP);
+               label->setGeometry(column+(column*STEP), row, STEP*1.75, STEP*1.75);
                label->setAlignment(Qt::AlignCenter);
             }
 
@@ -131,9 +135,9 @@ void MainWindow::createGraphicalBoard()
 
 void MainWindow::updateGraphicalBoard()
 {
-    for (int i = 0; i < SIZE; ++i)
+    for (int i = 0; i < boardsize_; ++i)
     {
-        for (int j = 0; j < SIZE; ++j)
+        for (int j = 0; j < boardsize_; ++j)
         {
             Coords coords;
             coords.first = j;
@@ -141,28 +145,39 @@ void MainWindow::updateGraphicalBoard()
             int nr = graboard_.get_item(coords)->get_value();
             QString s = QString::number(nr);
             labels_.at(j).at(i)->setText(s);
+
         }
     }
 }
 
+void MainWindow::winColors()
+{
+   ui_->graphicsView->setStyleSheet("QWidget: {background-color: green}");
+}
+
+void MainWindow::lossColors()
+{
+
+}
+
 void MainWindow::disableLabels()
 {
-    for (auto vec : labels_)
+    for (auto& vec : labels_)
     {
-        for (auto labeli : vec)
+        for (auto label : vec)
         {
-            labeli->setEnabled(false);
+            label->setEnabled(false);
         }
     }
 }
 
 void MainWindow::enableLabels()
 {
-    for (auto vec : labels_)
+    for (auto& vec : labels_)
     {
-        for (auto labeli : vec)
+        for (auto label : vec)
         {
-            labeli->setEnabled(true);
+            label->setEnabled(true);
         }
     }
 }
@@ -170,6 +185,13 @@ void MainWindow::enableLabels()
 void MainWindow::on_startButton_clicked()
 {
     amount_of_starts_++;
+    boardsize_ = ui_->sizeSpinBox->value();
+    graboard_.set_size(boardsize_);
+
+    if (boardsize_ != 4)
+    {
+        createGraphicalBoard();
+    }
 
     // Just resetting the game is enough, no need to initialize gameboard again
     if (amount_of_starts_ > 1)
@@ -185,7 +207,7 @@ void MainWindow::on_startButton_clicked()
 }
 
 
-void MainWindow::on_seedLine_textChanged(const QString &arg1)
+/*void MainWindow::on_seedLine_textChanged(const QString &arg1)
 {
     seed_ = arg1.toInt();
 }
@@ -194,7 +216,7 @@ void MainWindow::on_seedLine_textChanged(const QString &arg1)
 void MainWindow::on_goalLine_textChanged(const QString &arg1)
 {
     goal_ = arg1.toInt();
-}
+}*/
 
 
 void MainWindow::on_resetButton_clicked()
@@ -202,5 +224,18 @@ void MainWindow::on_resetButton_clicked()
     enableLabels();
     graboard_.reset();
     updateGraphicalBoard();
+}
+
+
+
+void MainWindow::on_seedSpinBox_valueChanged(int arg1)
+{
+    seed_ = arg1;
+}
+
+
+void MainWindow::on_goalSpinBox_valueChanged(int arg1)
+{
+    goal_ = arg1;
 }
 
