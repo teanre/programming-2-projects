@@ -26,7 +26,7 @@ public:
     // with random numbers.
     void fill(int seed);
 
-    void reset(int seed);
+    void reset();
 
     // Draws a new location (coordinates) from the random number generator and
     // puts the NEW_VALUE on that location, unless check_if_empty is true and

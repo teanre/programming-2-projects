@@ -52,7 +52,7 @@ void GameBoard::fill(int seed)
     }
 }
 
-void GameBoard::reset(int seed)
+void GameBoard::reset()
 {
     for( auto y = 0; y < SIZE; ++y )
     {

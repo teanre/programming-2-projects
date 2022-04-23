@@ -43,6 +43,8 @@ private:
     int seed_;
     int goal_;
 
+    int amount_of_starts_;
+
     const int STEP = 100;
     const int BORDER_UP = 0;
     const int BORDER_DOWN = 260;

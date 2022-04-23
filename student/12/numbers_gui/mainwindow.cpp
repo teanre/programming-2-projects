@@ -20,7 +20,8 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     , graboard_(board)
     , labels_()
     , seed_(0)
-    , goal_(0)
+    , goal_(2048)
+    , amount_of_starts_(0)
 {
     ui_->setupUi(this);
 
@@ -168,11 +169,19 @@ void MainWindow::enableLabels()
 
 void MainWindow::on_startButton_clicked()
 {
-    enableLabels();
-    graboard_.init_empty();
-    //kaivaa seedin
-    graboard_.fill(seed_);
-    updateGraphicalBoard();
+    amount_of_starts_++;
+
+    // Just resetting the game is enough, no need to initialize gameboard again
+    if (amount_of_starts_ > 1)
+    {
+        on_resetButton_clicked();
+    }
+    else
+    {
+        graboard_.init_empty();
+        graboard_.fill(seed_);
+        updateGraphicalBoard();
+    }
 }
 
 
@@ -191,7 +200,7 @@ void MainWindow::on_goalLine_textChanged(const QString &arg1)
 void MainWindow::on_resetButton_clicked()
 {
     enableLabels();
-    graboard_.reset(seed_);
+    graboard_.reset();
     updateGraphicalBoard();
 }
 
