@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QPushButton>
 #include <QLabel>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,21 +27,25 @@ private slots:
 
     void on_startButton_clicked();
 
-    //void on_seedLine_textChanged(const QString &arg1);
-
-   // void on_goalLine_textChanged(const QString &arg1);
-
     void on_resetButton_clicked();
-
 
     void on_seedSpinBox_valueChanged(int arg1);
 
     void on_goalSpinBox_valueChanged(int arg1);
 
+    void startTimer();
+    void stopTimer();
+    void resetTimer();
+    void updateLcd();
+
+
 private:
     Ui::MainWindow *ui_;
 
     QGraphicsScene* scene_;
+
+    QTimer* timer_;
+
     GameBoard& graboard_;
 
     std::vector<std::vector<QLabel*>> labels_;
@@ -50,6 +55,7 @@ private:
     int goal_;
 
     int amount_of_starts_;
+    int time_;
 
     const int STEP = 50;
     const int BORDER_UP = 0;
@@ -68,6 +74,10 @@ private:
     void disableLabels();
 
     void enableLabels();
+
+    void deleteLabels();
+
+
 
 };
 #endif // MAINWINDOW_HH

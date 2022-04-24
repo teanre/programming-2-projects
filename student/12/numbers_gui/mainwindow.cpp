@@ -5,6 +5,8 @@
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 #include <QGridLayout>
+#include <QLCDNumber>
+#include <QDebug>
 #include <iostream>
 
 const Coords DEFAULT_DIR = {0, 0};
@@ -17,14 +19,25 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow)
     , scene_()
+    , timer_()
     , graboard_(board)
     , labels_()
     , boardsize_(4)
     , seed_(0)
     , goal_(2048)
     , amount_of_starts_(0)
+    , time_(0)
 {
     ui_->setupUi(this);
+
+   // QLCDNumber *lcd  = new QLCDNumber(this);
+
+    timer_ = new QTimer(this);
+
+    connect(timer_, &QTimer::timeout, this, &MainWindow::updateLcd);
+    connect(ui_->startButton, &QPushButton::clicked, this, &MainWindow::startTimer);
+    //connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::stopTimer);
+    connect(ui_->resetButton, &QPushButton::clicked, this, &MainWindow::resetTimer);
 
     scene_ = new QGraphicsScene(this);
 
@@ -32,14 +45,16 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     int top_margin = 20; // y coordinate
 
     ui_->graphicsView->setGeometry(left_margin, top_margin,
-                                       boardsize_*STEP + 2, boardsize_*STEP + 2);
+                                     boardsize_*STEP + 2, boardsize_*STEP + 2);
+
+
     ui_->graphicsView->setScene(scene_);
 
     scene_->setSceneRect(0, 0, boardsize_*STEP - 1, boardsize_*STEP - 1);
 
-    ui_->seedLabel->setStyleSheet("QLabel: {background-color: green}");
-
     createGraphicalBoard();
+
+
 }
 
 MainWindow::~MainWindow()
@@ -79,12 +94,14 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             ui_->textBrowser->setText(text);
             winColors();
             disableLabels();
+            stopTimer();
         }
         else if (graboard_.is_full())
         {
             QString text = "Can't add new tile, you lost!";
             ui_->textBrowser->setText(text);
             disableLabels();
+            stopTimer();
         }
         graboard_.new_value(false);
     }
@@ -113,7 +130,7 @@ void MainWindow::createGraphicalBoard()
                 label->setGeometry(column, row+(row*STEP), STEP*1.75, STEP*1.75);
                 label->setAlignment(Qt::AlignCenter);
             }
-            else if (column >0)
+            else if (column > 0)
             {
                 scene_->addRect(column+(column*STEP), row+(row*STEP), STEP, STEP, blackPen, whiteBrush);
                 label->setGeometry(column+(column*STEP), row+(row*STEP), STEP*1.75, STEP*1.75);
@@ -182,21 +199,35 @@ void MainWindow::enableLabels()
     }
 }
 
+void MainWindow::deleteLabels()
+{
+    for (auto& vec : labels_)
+    {
+        for(auto& label: vec)
+        {
+            delete label;
+        }
+    }
+}
+
 void MainWindow::on_startButton_clicked()
 {
     amount_of_starts_++;
     boardsize_ = ui_->sizeSpinBox->value();
-    graboard_.set_size(boardsize_);
+    //graboard_.set_size(boardsize_);
 
-    if (boardsize_ != 4)
+   /* if (boardsize_ != 4)
     {
+        deleteLabels();
+        labels_.clear();
         createGraphicalBoard();
-    }
+    }*/
 
     // Just resetting the game is enough, no need to initialize gameboard again
     if (amount_of_starts_ > 1)
     {
         on_resetButton_clicked();
+        resetTimer();
     }
     else
     {
@@ -206,27 +237,13 @@ void MainWindow::on_startButton_clicked()
     }
 }
 
-
-/*void MainWindow::on_seedLine_textChanged(const QString &arg1)
-{
-    seed_ = arg1.toInt();
-}
-
-
-void MainWindow::on_goalLine_textChanged(const QString &arg1)
-{
-    goal_ = arg1.toInt();
-}*/
-
-
 void MainWindow::on_resetButton_clicked()
 {
     enableLabels();
     graboard_.reset();
     updateGraphicalBoard();
+    ui_->textBrowser->setText("");
 }
-
-
 
 void MainWindow::on_seedSpinBox_valueChanged(int arg1)
 {
@@ -239,3 +256,27 @@ void MainWindow::on_goalSpinBox_valueChanged(int arg1)
     goal_ = arg1;
 }
 
+void MainWindow::startTimer()
+{
+    timer_->start(1000);
+}
+
+void MainWindow::stopTimer()
+{
+    timer_->stop();
+    updateLcd();
+}
+
+void MainWindow::resetTimer()
+{
+    ui_->timerLcd->display(0);
+    time_ = 0;
+    startTimer();
+}
+
+void MainWindow::updateLcd()
+{
+      qDebug() << "aika o:" << time_ ;
+      time_++;
+    ui_->timerLcd->display(time_);
+}
