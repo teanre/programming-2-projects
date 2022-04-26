@@ -50,7 +50,6 @@ private:
 
     std::vector<std::vector<QLabel*>> labels_;
 
-    int boardsize_;
     int seed_;
     int goal_;
 

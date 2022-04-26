@@ -18,34 +18,27 @@
     <property name="geometry">
      <rect>
       <x>490</x>
-      <y>130</y>
+      <y>90</y>
       <width>241</width>
       <height>305</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QLabel" name="seedLabel">
+     <item row="5" column="1">
+      <widget class="QPushButton" name="pauseButton">
        <property name="text">
-        <string>Seed number</string>
+        <string>Pause</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="1">
+     <item row="7" column="0">
       <widget class="QPushButton" name="resetButton">
        <property name="text">
         <string>Reset</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
-      <widget class="QPushButton" name="closeButton">
-       <property name="text">
-        <string>Close</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
+     <item row="1" column="1">
       <widget class="QSpinBox" name="goalSpinBox">
        <property name="minimum">
         <number>4</number>
@@ -58,14 +51,10 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="goalLabel">
-       <property name="text">
-        <string>Goal</string>
-       </property>
-      </widget>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="seedSpinBox"/>
      </item>
-     <item row="5" column="1">
+     <item row="5" column="0">
       <widget class="QPushButton" name="startButton">
        <property name="text">
         <string>Start</string>
@@ -73,22 +62,26 @@
       </widget>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="seedLabel">
        <property name="text">
-        <string>Size of board</string>
+        <string>Seed number</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QSpinBox" name="seedSpinBox"/>
-     </item>
-     <item row="9" column="1">
+     <item row="8" column="0" colspan="2">
       <widget class="QTextBrowser" name="textBrowser"/>
      </item>
-     <item row="0" column="1">
-      <widget class="QSpinBox" name="sizeSpinBox">
-       <property name="value">
-        <number>4</number>
+     <item row="1" column="0">
+      <widget class="QLabel" name="goalLabel">
+       <property name="text">
+        <string>Goal</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
        </property>
       </widget>
      </item>
@@ -107,9 +100,9 @@
    <widget class="QLCDNumber" name="timerLcd">
     <property name="geometry">
      <rect>
-      <x>610</x>
+      <x>500</x>
       <y>50</y>
-      <width>101</width>
+      <width>221</width>
       <height>31</height>
      </rect>
     </property>
@@ -136,8 +129,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>711</x>
-     <y>277</y>
+     <x>729</x>
+     <y>356</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
