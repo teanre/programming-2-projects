@@ -1,3 +1,11 @@
+/*
+ * Program author
+ * Name: Terhi Rees
+ * Student number: 150250878
+ * UserID: rctere
+ * E-Mail: terhi.rees@tuni.fi
+ */
+
 #include "mainwindow.hh"
 #include "ui_mainwindow.h"
 #include "gameboard.hh"
@@ -9,8 +17,8 @@
 #include <QDebug>
 #include <iostream>
 
-int LEFT_MARGIN = 50; // x coordinate
-int TOP_MARGIN = 50; // y coordinate
+int LEFT_MARGIN = 50;
+int TOP_MARGIN = 50;
 
 const Coords DEFAULT_DIR = {0, 0};
 const Coords LEFT = {0, -1};
@@ -18,12 +26,19 @@ const Coords UP = {-1, 0};
 const Coords RIGHT = {0, 1};
 const Coords DOWN = {1, 0};
 
+const std::map<int, QString> COLORS = {
+    {0, "white"}, {2, "cyan"}, {4, "darkCyan"}, {8, "darkRed"}, {16, "magenta"},
+    {32, "darkMagenta"}, {64, "green"}, {128, "darkGreen"}, {256, "yellow"},
+    {512, "darkYellow"}, {1024, "blue"}, {2048, "darkBlue"}
+};
+
+
 MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow)
     , scene_()
     , timer_()
-    , graboard_(board)
+    , graphicalboard_(board)
     , labels_()
     , seed_(0)
     , goal_(2048)
@@ -35,21 +50,19 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     timer_ = new QTimer(this);
 
     connect(timer_, &QTimer::timeout, this, &MainWindow::updateLcd);
-    connect(ui_->startButton, &QPushButton::clicked, this, &MainWindow::startTimer);
-    //connect(ui->stopButton, &QPushButton::clicked, this, &MainWindow::stopTimer);
-    connect(ui_->resetButton, &QPushButton::clicked, this, &MainWindow::resetTimer);
 
-    this->setStyleSheet("QMainWindow {background-color: lightGrey;}");
+    this->setStyleSheet("QMainWindow {background-color: lightGrey}");
 
     scene_ = new QGraphicsScene(this);
 
     ui_->graphicsView->setGeometry(LEFT_MARGIN, TOP_MARGIN,
                                    SIZE * STEP + 2, SIZE * STEP + 2);
 
-
     ui_->graphicsView->setScene(scene_);
 
     scene_->setSceneRect(0, 0, SIZE * STEP - 1, SIZE * STEP - 1);
+
+    ui_->timerLcd->setStyleSheet("QLCDNumber {background-color: white}");
 
     createGraphicalBoard();
 }
@@ -62,7 +75,7 @@ MainWindow::~MainWindow()
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     Coords dir = DEFAULT_DIR;
-    // moving to left
+
     if(event->key() == Qt::Key_A)
     {
         dir = LEFT;
@@ -82,29 +95,26 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 
     if (dir != DEFAULT_DIR)
     {
-        if (graboard_.move(dir, goal_))
+        if (graphicalboard_.move(dir, goal_))
         {
-            QString text = "You reached the goal value of ";
             QString goalqs = QString::number(goal_);
-            text += goalqs;
-            text += "!";
+            QString text = "You reached the goal value of " + goalqs + "!";
             ui_->textBrowser->setText(text);
-            winColors();
+            winColorChange();
             disableLabels();
-            event->ignore();
             stopTimer();
             return;
         }
-        else if (graboard_.is_full())
+        else if (graphicalboard_.is_full())
         {
             QString text = "Can't add new tile, you lost!";
             ui_->textBrowser->setText(text);
-            lossColors();
+            lossColorChange();
             disableLabels();
             stopTimer();
             return;
         }
-        graboard_.new_value(false);
+        graphicalboard_.new_value(false);
     }
     updateGraphicalBoard();
 }
@@ -112,38 +122,50 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 
 void MainWindow::createGraphicalBoard()
 {
-
     QBrush whiteBrush(Qt::white);
     QPen blackPen(Qt::black);
     blackPen.setWidth(2);
 
-    std::vector<QGraphicsRectItem*> rects;
     std::vector<QLabel*> helper;
 
     for (int row = 0; row < SIZE; ++row)
     {
         for (int column = 0; column < SIZE; ++column)
         {
-            QLabel* label = new QLabel("*", this);
+            QLabel* label = new QLabel("", this);
             if (column == 0)
             {
-                scene_->addRect(column, row +(row * STEP), STEP, STEP, blackPen, whiteBrush);
-                label->setGeometry(LEFT_MARGIN + column, TOP_MARGIN + row + (row * STEP), STEP, STEP);
+                scene_->addRect(column,
+                                row + (row * STEP),
+                                STEP, STEP,
+                                blackPen, whiteBrush);
+                label->setGeometry(LEFT_MARGIN + column,
+                                   TOP_MARGIN + row + (row * STEP),
+                                   STEP, STEP);
                 label->setAlignment(Qt::AlignCenter);
             }
             else if (column > 0)
             {
-                scene_->addRect(column+(column*STEP), row+(row*STEP), STEP, STEP, blackPen, whiteBrush);
-                label->setGeometry(LEFT_MARGIN + column + (column * STEP), TOP_MARGIN + row + (row * STEP), STEP, STEP);
+                scene_->addRect(column + (column * STEP),
+                                row + (row*STEP),
+                                STEP, STEP,
+                                blackPen, whiteBrush);
+                label->setGeometry(LEFT_MARGIN + column + (column * STEP),
+                                   TOP_MARGIN + row + (row * STEP),
+                                   STEP, STEP);
                 label->setAlignment(Qt::AlignCenter);
             }
             else
             {
-               scene_->addRect(column+(column*STEP), row, STEP, STEP, blackPen, whiteBrush);
-               label->setGeometry(LEFT_MARGIN + TOP_MARGIN + column + (column * STEP), row, STEP, STEP);
+               scene_->addRect(column + (column * STEP),
+                               row,
+                               STEP, STEP,
+                               blackPen, whiteBrush);
+               label->setGeometry(LEFT_MARGIN + TOP_MARGIN
+                                  + column + (column * STEP),
+                                  row, STEP, STEP);
                label->setAlignment(Qt::AlignCenter);
             }
-
             helper.push_back(label);
         }
         labels_.push_back(helper);
@@ -160,22 +182,50 @@ void MainWindow::updateGraphicalBoard()
             Coords coords;
             coords.first = j;
             coords.second = i;
-            int nr = graboard_.get_item(coords)->get_value();
+            int nr = graphicalboard_.get_item(coords)->get_value();
             QString s = QString::number(nr);
             labels_.at(j).at(i)->setText(s);
 
+            // change tile colour according to the value
+            if (nr >= 0 && nr <= 2048)
+            {
+                QString text = "QLabel {background-color: " + COLORS.at(nr) +"}";
+                labels_.at(j).at(i)->setStyleSheet(text);
+            }
         }
     }
 }
 
-void MainWindow::winColors()
+bool MainWindow::goalIsValid(int n)
 {
-    this->setStyleSheet("QMainWindow {background-color: green;}");
+    if ( n == 0 )
+    {
+        ui_->textBrowser->
+            setText("Goal is not valid, try again! Must be a power of two.");
+        return false;
+    }
+    while( n != 1 )
+    {
+        n = n/2;
+
+        if( n % 2 != 0 && n != 1 )
+        {
+            ui_->textBrowser->
+               setText("Goal is not valid, try again! Must be a power of two.");
+            return false;
+        }
+    }
+    return true;
 }
 
-void MainWindow::lossColors()
+void MainWindow::winColorChange()
 {
-    this->setStyleSheet("QMainWindow {background-color: red;}");
+    this->setStyleSheet("QMainWindow {background-color: green}");
+}
+
+void MainWindow::lossColorChange()
+{
+    this->setStyleSheet("QMainWindow {background-color: red}");
 }
 
 void MainWindow::disableLabels()
@@ -200,42 +250,38 @@ void MainWindow::enableLabels()
     }
 }
 
-void MainWindow::deleteLabels()
-{
-    for (auto& vec : labels_)
-    {
-        for(auto& label: vec)
-        {
-            delete label;
-        }
-    }
-}
-
 void MainWindow::on_startButton_clicked()
 {
-    amount_of_starts_++;
-
-    // Just resetting the game is enough, no need to initialize gameboard again
-    if (amount_of_starts_ > 1)
+    if ( goalIsValid(goal_) )
     {
-        on_resetButton_clicked();
-        resetTimer();
-    }
-    else
-    {
-        graboard_.init_empty();
-        graboard_.fill(seed_);
-        updateGraphicalBoard();
+        amount_of_starts_++;
+        startTimer();
+         // Resetting the game is enough, no need to initialize gameboard again
+        if (amount_of_starts_ > 1)
+        {
+            on_resetButton_clicked();
+            resetTimer();
+        }
+        else
+        {
+            graphicalboard_.init_empty();
+            graphicalboard_.fill(seed_);
+            updateGraphicalBoard();
+        }
     }
 }
 
 void MainWindow::on_resetButton_clicked()
 {
-    this->setStyleSheet("QMainWindow {background-color: lightGrey;}");
-    enableLabels();
-    graboard_.reset();
-    updateGraphicalBoard();
-    ui_->textBrowser->setText("");
+    if ( goalIsValid(goal_) )
+    {
+        enableLabels();
+        resetTimer();
+        this->setStyleSheet("QMainWindow {background-color: lightGrey;}");       
+        graphicalboard_.reset();
+        updateGraphicalBoard();
+        ui_->textBrowser->setText("");
+    }
 }
 
 void MainWindow::on_seedSpinBox_valueChanged(int arg1)
@@ -269,7 +315,6 @@ void MainWindow::resetTimer()
 
 void MainWindow::updateLcd()
 {
-    qDebug() << "aika o:" << time_ ;
     time_++;
     ui_->timerLcd->display(time_);
 }

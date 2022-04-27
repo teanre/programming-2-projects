@@ -1,3 +1,15 @@
+/* NumberTile class
+ *
+ * Handles information concerning a single tile on the gameboard:
+ * it's coordinates and value.
+ *
+ * Program author
+ * Name: Terhi Rees
+ * Student number: 150250878
+ * UserID: rctere
+ * E-Mail: terhi.rees@tuni.fi
+ */
+
 #ifndef NUMBERTILE_HH
 #define NUMBERTILE_HH
 
@@ -35,8 +47,10 @@ public:
     // Sets the value of is_merged_ as false.
     void reset_turn();
 
+    // Returns the current value of the tile.
     int get_value();
 
+    // Resets the value of a tile back to 0.
     void reset_value();
 
 private:
