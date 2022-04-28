@@ -1,10 +1,15 @@
 /*
-* Program author
-* Name: Terhi Rees
-* Student number: 150250878
-* UserID: rctere
-* E-Mail: terhi.rees@tuni.fi
-*/
+ * GameBoard class
+ *
+ * Includes information and methods concerning the gameboard.
+ *
+ * Program author
+ * Name: Terhi Rees
+ * Student number: 150250878
+ * UserID: rctere
+ * E-Mail: terhi.rees@tuni.fi
+ *
+ */
 
 #ifndef GAMEBOARD_HH
 #define GAMEBOARD_HH

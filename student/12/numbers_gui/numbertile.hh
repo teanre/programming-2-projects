@@ -1,13 +1,13 @@
 /* NumberTile class
  *
- * Handles information concerning a single tile on the gameboard:
- * it's coordinates and value.
+ * Handles information and methods concerning a single tile on the gameboard.
  *
  * Program author
  * Name: Terhi Rees
  * Student number: 150250878
  * UserID: rctere
  * E-Mail: terhi.rees@tuni.fi
+ *
  */
 
 #ifndef NUMBERTILE_HH

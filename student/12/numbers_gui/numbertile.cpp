@@ -7,7 +7,6 @@
  *
  */
 
-
 #include "numbertile.hh"
 #include "gameboard.hh"
 #include <iomanip>

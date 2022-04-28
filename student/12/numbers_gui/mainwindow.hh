@@ -1,10 +1,14 @@
-/*
-* Program author
-* Name: Terhi Rees
-* Student number: 150250878
-* UserID: rctere
-* E-Mail: terhi.rees@tuni.fi
-*/
+/*Mainwindow class
+ *
+ * Handles the user interface of the game.
+ *
+ * Program author
+ * Name: Terhi Rees
+ * Student number: 150250878
+ * UserID: rctere
+ * E-Mail: terhi.rees@tuni.fi
+ *
+ */
 
 #ifndef MAINWINDOW_HH
 #define MAINWINDOW_HH
@@ -16,6 +20,32 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QTimer>
+
+// For adjusting gameboard element locations and sizes.
+const int LEFT_MARGIN = 50;
+const int TOP_MARGIN = 50;
+const int STEP = 50;
+const int BORDER_UP = 0;
+const int BORDER_DOWN = 260;
+const int BORDER_LEFT = 0;
+const int BORDER_RIGHT = 680;
+
+// Directions for key presses
+const Coords DEFAULT_DIR = {0, 0};
+const Coords LEFT = {0, -1};
+const Coords UP = {-1, 0};
+const Coords RIGHT = {0, 1};
+const Coords DOWN = {1, 0};
+
+// Tile colors by value
+const std::map<int, QString> COLORS = {
+    {0, "white"}, {2, "rgb(255, 228, 225)"}, {4, "rgb(72, 209, 204)"},
+    {8, "rgb(199, 21, 133)"}, {16, "rgb(255, 20, 147)"},
+    {32, "rgb(100, 149, 237)"}, {64, "rgb(127, 255, 212)"},
+    {128, "rgb(221, 160, 221)"}, {256, "rgb(255, 250, 205)"},
+    {512, "rgb(255, 105, 180)"}, {1024, "rgb( 65, 105, 225)"},
+    {2048, "rgb(255, 215, 0)"}
+};
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -41,6 +71,7 @@ private slots:
 
     void on_goalSpinBox_valueChanged(int arg1);
 
+    // Timer related methods.
     void startTimer();
     void stopTimer();
     void resetTimer();
@@ -65,12 +96,6 @@ private:
     // How many times game has been started
     int amount_of_starts_;
     int time_;
-
-    const int STEP = 50;
-    const int BORDER_UP = 0;
-    const int BORDER_DOWN = 260;
-    const int BORDER_LEFT = 0;
-    const int BORDER_RIGHT = 680;
 
     // Creates the user interface of gameboard.
     void createGraphicalBoard();

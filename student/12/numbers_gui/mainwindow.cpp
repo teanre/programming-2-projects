@@ -4,6 +4,7 @@
  * Student number: 150250878
  * UserID: rctere
  * E-Mail: terhi.rees@tuni.fi
+ *
  */
 
 #include "mainwindow.hh"
@@ -15,23 +16,6 @@
 #include <QGridLayout>
 #include <QLCDNumber>
 #include <QDebug>
-#include <iostream>
-
-int LEFT_MARGIN = 50;
-int TOP_MARGIN = 50;
-
-const Coords DEFAULT_DIR = {0, 0};
-const Coords LEFT = {0, -1};
-const Coords UP = {-1, 0};
-const Coords RIGHT = {0, 1};
-const Coords DOWN = {1, 0};
-
-const std::map<int, QString> COLORS = {
-    {0, "white"}, {2, "cyan"}, {4, "darkCyan"}, {8, "darkRed"}, {16, "magenta"},
-    {32, "darkMagenta"}, {64, "green"}, {128, "darkGreen"}, {256, "yellow"},
-    {512, "darkYellow"}, {1024, "blue"}, {2048, "darkBlue"}
-};
-
 
 MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
@@ -101,9 +85,8 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             QString text = "You reached the goal value of " + goalqs + "!";
             ui_->textBrowser->setText(text);
             winColorChange();
-            disableLabels();
+            //disableLabels();
             stopTimer();
-            return;
         }
         else if (graphicalboard_.is_full())
         {
@@ -220,12 +203,12 @@ bool MainWindow::goalIsValid(int n)
 
 void MainWindow::winColorChange()
 {
-    this->setStyleSheet("QMainWindow {background-color: green}");
+    this->setStyleSheet("QMainWindow {background-color: rgb(124, 252, 0)}");
 }
 
 void MainWindow::lossColorChange()
 {
-    this->setStyleSheet("QMainWindow {background-color: red}");
+    this->setStyleSheet("QMainWindow {background-color: rgb(255, 69, 0)}");
 }
 
 void MainWindow::disableLabels()

@@ -1,13 +1,18 @@
-/*  2048-game
+/*  2048
  *
- *  2048 is a game where player's goal is to move the tiles untial goal number
- *  is reached. At first player gives a seed number (for randomizing starting
- *  situation on game board) and a goal number. Original goal is 2048 but user
- *  can choose their own goal, it only needs to be power of 2. To start player
- *  clicks start button. Programme lets user know if given goal is not valid.
+ * Desc:
+ * This program generates a game of 2048, a tile combining game where the goal
+ * originally is to get from 2's to 2048. The board is SIZE x SIZE,
+ * (original is 4 x 4) and every round the player chooses a direction to which
+ * the tiles should move to. If they collide with a wall or a different value,
+ * they will move as close as they can get. If they collide with a tile with
+ * same value, they will merge and double the value. The tile will continue to
+ * move and combine until a wall or other tile comes along.
  *
- *  Gameboard has tiles with value 2 at start in random places. When two tiles
- *  with the same number touch, they merge into one tile, adding up their values.
+ * At first player gives a seed number (for randomizing starting
+ * situation on game board) and a goal number. In this game player can choose
+ * their goal, it only needs to be power of 2. To start playing player
+ * clicks start button. Programme lets user know if given goal is not valid.
  *
  *  Player moves the tiles with keyboard buttons:
  *  a - left

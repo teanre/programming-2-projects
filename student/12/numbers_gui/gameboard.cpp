@@ -4,6 +4,7 @@
 * Student number: 150250878
 * UserID: rctere
 * E-Mail: terhi.rees@tuni.fi
+*
 */
 
 #include "gameboard.hh"
