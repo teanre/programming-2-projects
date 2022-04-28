@@ -19,25 +19,15 @@
 
 MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
-    , ui_(new Ui::MainWindow)
-    , scene_()
-    , timer_()
-    , graphicalboard_(board)
-    , labels_()
-    , seed_(0)
-    , goal_(2048)
-    , amount_of_starts_(0)
-    , time_(0)
+    , ui_(new Ui::MainWindow), scene_(new QGraphicsScene(this))
+    , timer_(new QTimer(this)), graphicalboard_(board), labels_()
+    , seed_(0), goal_(2048), amount_of_starts_(0), time_(0)
 {
     ui_->setupUi(this);
-
-    timer_ = new QTimer(this);
 
     connect(timer_, &QTimer::timeout, this, &MainWindow::updateLcd);
 
     this->setStyleSheet("QMainWindow {background-color: lightGrey}");
-
-    scene_ = new QGraphicsScene(this);
 
     ui_->graphicsView->setGeometry(LEFT_MARGIN, TOP_MARGIN,
                                    SIZE * STEP + 2, SIZE * STEP + 2);
@@ -85,7 +75,6 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             QString text = "You reached the goal value of " + goalqs + "!";
             ui_->textBrowser->setText(text);
             winColorChange();
-            //disableLabels();
             stopTimer();
         }
         else if (graphicalboard_.is_full())
@@ -203,7 +192,7 @@ bool MainWindow::goalIsValid(int n)
 
 void MainWindow::winColorChange()
 {
-    this->setStyleSheet("QMainWindow {background-color: rgb(124, 252, 0)}");
+    this->setStyleSheet("QMainWindow {background-color: rgb(50, 205, 50)}");
 }
 
 void MainWindow::lossColorChange()
@@ -239,7 +228,9 @@ void MainWindow::on_startButton_clicked()
     {
         amount_of_starts_++;
         startTimer();
-         // Resetting the game is enough, no need to initialize gameboard again
+
+        // If game has been played before, resetting is enough, no need to
+        // initialize gameboard again
         if (amount_of_starts_ > 1)
         {
             on_resetButton_clicked();
