@@ -20,10 +20,26 @@
       <x>500</x>
       <y>100</y>
       <width>241</width>
-      <height>161</height>
+      <height>168</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="seedSpinBox"/>
+     </item>
+     <item row="1" column="1">
+      <widget class="QSpinBox" name="goalSpinBox">
+       <property name="minimum">
+        <number>4</number>
+       </property>
+       <property name="maximum">
+        <number>65536</number>
+       </property>
+       <property name="value">
+        <number>2048</number>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QLabel" name="seedLabel">
        <property name="text">
@@ -38,16 +54,6 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
-      <widget class="QPushButton" name="resetButton">
-       <property name="text">
-        <string>Reset</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QSpinBox" name="seedSpinBox"/>
-     </item>
      <item row="5" column="0">
       <widget class="QPushButton" name="startButton">
        <property name="text">
@@ -55,16 +61,24 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QSpinBox" name="goalSpinBox">
-       <property name="minimum">
-        <number>4</number>
+     <item row="6" column="1">
+      <widget class="QPushButton" name="closeButton">
+       <property name="text">
+        <string>Close</string>
        </property>
-       <property name="maximum">
-        <number>65536</number>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset</string>
        </property>
-       <property name="value">
-        <number>2048</number>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QPushButton" name="pauseButton">
+       <property name="text">
+        <string>Pause</string>
        </property>
       </widget>
      </item>
@@ -88,19 +102,6 @@
       <width>111</width>
       <height>31</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="closeButton">
-    <property name="geometry">
-     <rect>
-      <x>560</x>
-      <y>260</y>
-      <width>117</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Close</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="textBrowser">

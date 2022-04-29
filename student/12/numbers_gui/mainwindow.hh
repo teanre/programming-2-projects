@@ -78,6 +78,8 @@ private slots:
     void updateLcd();
 
 
+    void on_pauseButton_clicked();
+
 private:
     Ui::MainWindow *ui_;
 
@@ -92,6 +94,8 @@ private:
 
     int seed_;
     int goal_;
+
+    bool is_paused_;
 
     // How many times game has been started
     int amount_of_starts_;

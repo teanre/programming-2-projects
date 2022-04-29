@@ -21,7 +21,7 @@ MainWindow::MainWindow(GameBoard& board, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow), scene_(new QGraphicsScene(this))
     , timer_(new QTimer(this)), graphicalboard_(board), labels_()
-    , seed_(0), goal_(2048), amount_of_starts_(0), time_(0)
+    , seed_(0), goal_(2048), is_paused_(false), amount_of_starts_(0), time_(0)
 {
     ui_->setupUi(this);
 
@@ -48,6 +48,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
+   if (is_paused_)
+   {
+       return;
+   }
+
     Coords dir = DEFAULT_DIR;
 
     if(event->key() == Qt::Key_A)
@@ -74,6 +79,7 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
             QString goalqs = QString::number(goal_);
             QString text = "You reached the goal value of " + goalqs + "!";
             ui_->textBrowser->setText(text);
+            is_paused_ = true;
             winColorChange();
             stopTimer();
         }
@@ -206,6 +212,7 @@ void MainWindow::disableLabels()
     {
         for (auto label : vec)
         {
+            is_paused_ = true;
             label->setEnabled(false);
         }
     }
@@ -234,7 +241,6 @@ void MainWindow::on_startButton_clicked()
         if (amount_of_starts_ > 1)
         {
             on_resetButton_clicked();
-            resetTimer();
         }
         else
         {
@@ -249,6 +255,7 @@ void MainWindow::on_resetButton_clicked()
 {
     if ( goalIsValid(goal_) )
     {
+        is_paused_ = false;
         enableLabels();
         resetTimer();
         this->setStyleSheet("QMainWindow {background-color: lightGrey;}");       
@@ -257,6 +264,8 @@ void MainWindow::on_resetButton_clicked()
         ui_->textBrowser->setText("");
     }
 }
+
+
 
 void MainWindow::on_seedSpinBox_valueChanged(int arg1)
 {
@@ -292,3 +301,23 @@ void MainWindow::updateLcd()
     time_++;
     ui_->timerLcd->display(time_);
 }
+
+void MainWindow::on_pauseButton_clicked()
+{
+    if (is_paused_)
+    {
+        is_paused_ = false;
+        ui_->textBrowser->setText("");
+        ui_->pauseButton->setText("Pause");
+        startTimer();
+    }
+    else
+    {
+        is_paused_ = true;
+        stopTimer();
+        ui_->textBrowser
+           ->setText("Game is paused. Press continue if you wish to proceed.");
+        ui_->pauseButton->setText("Continue");
+    }
+}
+
